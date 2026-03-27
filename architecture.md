@@ -136,9 +136,23 @@ Item N ◄──► Tag (many-to-many via item_tags)
 
 ## 4. State Management
 
-### 4.1 Global State (Zustand)
+### 4.1 Chosen: Zustand
+
+After evaluating options (React Context, MobX, Redux Toolkit, Jotai), we chose **Zustand**:
+- Tiny (~1KB), minimal bundle size
+- Simple API, low learning curve
+- Works great with MMKV for persistence
+- Ignite-compatible (just add zustand + zustand-persist)
+
+### 4.2 Global State (Zustand Store)
 
 ```typescript
+import { create } from 'zustand'
+import { persist, createJSONStorage } from 'zustand/middleware'
+import { MMKV } from 'react-native-mmkv'
+
+const storage = new MMKV({ id: 'stash-tracker' })
+
 interface AppState {
   // Items
   items: Item[];
@@ -160,7 +174,21 @@ interface AppState {
   selectedItems: string[];  // For multi-select
   isLoading: boolean;
 }
+
+export const useAppStore = create<AppState>()(
+  persist(
+    (set, get) => ({
+      // ... state and actions
+    }),
+    {
+      name: 'stash-tracker-store',
+      storage: createJSONStorage(() => storage),
+    }
+  )
+)
 ```
+
+**Note:** We can still use React Context for specific needs (e.g., ThemeContext) while using Zustand for global app state.
 
 ### 4.2 Local State
 
@@ -403,7 +431,7 @@ jobs:
 | Decision | Options | Recommendation |
 |----------|---------|----------------|
 | DB | WatermelonDB vs expo-sqlite | WatermelonDB (better sync support) |
-| State | Redux vs Context vs Zustand | Zustand (simpler) |
+| State | React Context vs MobX vs Redux vs Zustand vs Jotai | **Zustand** (simple, lightweight, MMKV-compatible) |
 | LLM | On-device vs API | API for v1, investigate on-device for v2 |
 | Navigation | React Navigation | React Navigation (standard) |
 | Forms | React Hook Form vs plain | React Hook Form |
