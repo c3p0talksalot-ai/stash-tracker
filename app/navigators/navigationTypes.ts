@@ -24,6 +24,10 @@ export type AppStackParamList = {
   ItemDetail: { itemId: string }
   ItemEditor: { itemId?: string }
   Demo: NavigatorScreenParams<DemoTabParamList>
+  // Inventory screens
+  ItemsList: undefined
+  ItemDetail: { itemId: string }
+  ItemEditor: { itemId?: string }
   // 🔥 Your screens go here
   // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
 }
