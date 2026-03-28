@@ -52,7 +52,12 @@
 - As a user, I can see total estimated value
 - As a user, I can see items added over time (timeline)
 
-### 2.7 Settings ([Ticket #29](https://trello.com/c/9efivEkB))
+### 2.7 Share & Receive ([Ticket #33](https://trello.com/c/G5KB2XgA))
+- As a user, I can share one or more selected items to other apps
+- As a user, I can receive shared content from other apps
+- As a user, when receiving shared content, I can choose to add to existing item or create new item
+
+### 2.8 Settings ([Ticket #29](https://trello.com/c/9efivEkB))
 - As a user, I can adjust font size
 - As a user, I can toggle dark/light mode
 - As a user, I can set left/right handed mode
