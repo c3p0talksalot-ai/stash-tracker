@@ -64,6 +64,7 @@ stash-tracker/
 │   │   ├── CropScreen.tsx
 │   │   ├── SearchScreen.tsx
 │   │   ├── SettingsScreen.tsx
+│   │   ├── TagsScreen.tsx         # Tag management
 │   │   └── HelpScreen.tsx
 │   ├── navigation/        # React Navigation setup
 │   │   └── AppNavigator.tsx
@@ -78,12 +79,17 @@ stash-tracker/
 │   │   ├── llm.ts         # LLM API client
 │   │   ├── backup.ts      # Export/import logic
 │   │   └── cloudSync.ts   # Google Drive, etc.
-│   ├── models/            # Data models (WatermelonDB)
-│   │   ├── Item.ts
-│   │   ├── Property.ts
-│   │   ├── Attachment.ts
-│   │   ├── Tag.ts
-│   │   └── Setting.ts
+│   ├── database/          # WatermelonDB
+│   │   ├── schema.ts      # Database schema
+│   │   ├── index.ts       # DB initialization
+│   │   └── models/        # Model classes
+│   │       ├── Item.ts
+│   │       ├── Property.ts
+│   │       ├── Attachment.ts
+│   │       ├── AttachmentMetadata.ts
+│   │       ├── Tag.ts
+│   │       ├── ItemTag.ts
+│   │       └── Setting.ts
 │   ├── theme/             # Design tokens
 │   │   ├── colors.ts
 │   │   ├── spacing.ts
@@ -91,6 +97,7 @@ stash-tracker/
 │   │   └── index.ts
 │   ├── utils/             # Helpers
 │   │   ├── suggestions.ts  # Smart property suggestions
+│   │   ├── tagUtils.ts     # Tag dedup & similarity
 │   │   ├── constants.ts
 │   │   └── ...
 │   └── App.tsx            # Root component
@@ -110,33 +117,123 @@ stash-tracker/
 
 | Table | Description |
 |-------|-------------|
-| `items` | Core inventory items |
+| `items` | Core inventory items (name required, others optional) |
 | `properties` | Key/value/unit for items |
 | `attachments` | Files attached to items |
-| `tags` | User-defined tags |
+| `attachment_metadata` | Key-value metadata for attachments |
+| `tags` | User-defined tags with dedup support |
 | `item_tags` | Many-to-many join table |
 | `settings` | User preferences |
 
-### 3.2 Relationships
+### 3.2 Schema Details
+
+**items**
+| Column | Type | Required | Notes |
+|--------|------|----------|-------|
+| name | string | ✓ | Always required |
+| description | string | | Optional |
+| location | string | | Optional |
+| purchase_date | number | | Unix timestamp |
+| purchase_price | number | | In cents |
+| created_at | number | | Unix timestamp |
+| updated_at | number | | Unix timestamp |
+
+**properties**
+| Column | Type | Notes |
+|--------|------|-------|
+| item_id | string | Foreign key, indexed |
+| key | string | Property name |
+| value | string | Property value |
+| unit | string | Optional (e.g., "kg", "in") |
+| created_at | number | |
+| updated_at | number | |
+
+**attachments**
+| Column | Type | Notes |
+|--------|------|-------|
+| item_id | string | Foreign key, indexed |
+| file_uri | string | Local file path |
+| mime_type | string | e.g., "image/jpeg" |
+| file_size | number | In bytes |
+| thumbnail_uri | string | Optional |
+| original_filename | string | Original file name |
+| alt_text | string | Accessibility text |
+| created_at | number | |
+| updated_at | number | |
+
+**attachment_metadata**
+| Column | Type | Notes |
+|--------|------|-------|
+| attachment_id | string | Foreign key, indexed |
+| key | string | Metadata key |
+| value | string | Metadata value |
+| created_at | number | |
+| updated_at | number | |
+
+**tags**
+| Column | Type | Notes |
+|--------|------|-------|
+| name | string | Display name |
+| normalized_name | string | Lowercase, trimmed (for dedup) |
+| slug | string | URL-safe identifier |
+| color | string | Optional hex color |
+| usage_count | number | Denormalized count |
+| created_at | number | |
+| updated_at | number | |
+
+### 3.3 Relationships
 
 ```
 Item 1 ──► Property (one-to-many)
 Item 1 ──► Attachment (one-to-many)
+  Attachment 1 ──► AttachmentMetadata (one-to-many)
 Item N ◄──► Tag (many-to-many via item_tags)
 ```
 
-### 3.3 Indexes
+### 3.4 Indexes
 
 - `items.name` — for search
 - `items.created_at` — for sorting
-- `tags.name` — for lookup
-- `properties.key` + `properties.item_id` — for suggestions
+- `items.location` — for filtering
+- `tags.normalized_name` — for dedup lookups
+- `tags.slug` — for lookups
+- `tags.usage_count` — for sorting
+- `properties.item_id` + `properties.key` — for suggestions
+- `attachments.item_id` — for fetching item attachments
+- `attachment_metadata.attachment_id` — for fetching attachment metadata
 
 ---
 
-## 4. State Management
+## 4. Tag Dedup Strategy
 
-### 4.1 Chosen: Zustand
+### 4.1 Normalization Rules
+- Trim whitespace: `" electronics "` → `"electronics"`
+- Lowercase: `"ELECTRONICS"` → `"electronics"`
+- Slugify: `"USB Cables"` → `"usb-cables"`
+
+### 4.2 On Tag Creation
+1. Normalize input name
+2. Query for existing tag with same `normalized_name`
+3. If found → reuse existing tag (increment `usage_count`)
+4. If not found → create new tag with normalized name + slug
+
+### 4.3 Similarity Detection
+- Use string-similarity library (Dice coefficient)
+- When adding tags, show warning for similar existing tags (>80% match)
+- Tag management screen: bulk merge/rename/delete
+
+### 4.4 Tag Management Screen Features
+- View all tags (paginated, sorted by usage_count)
+- Search/filter tags
+- Merge tags (redirect all item associations to target)
+- Rename tags (update name + normalized_name + slug)
+- Delete tags (with confirmation if usage_count > 0)
+
+---
+
+## 5. State Management
+
+### 5.1 Chosen: Zustand
 
 After evaluating options (React Context, MobX, Redux Toolkit, Jotai), we chose **Zustand**:
 - Tiny (~1KB), minimal bundle size
@@ -144,7 +241,7 @@ After evaluating options (React Context, MobX, Redux Toolkit, Jotai), we chose *
 - Works great with MMKV for persistence
 - Ignite-compatible (just add zustand + zustand-persist)
 
-### 4.2 Global State (Zustand Store)
+### 5.2 Global State (Zustand Store)
 
 ```typescript
 import { create } from 'zustand'
@@ -190,7 +287,7 @@ export const useAppStore = create<AppState>()(
 
 **Note:** We can still use React Context for specific needs (e.g., ThemeContext) while using Zustand for global app state.
 
-### 4.2 Local State
+### 5.3 Local State
 
 - Form inputs (React useState)
 - Modal visibility
@@ -199,9 +296,9 @@ export const useAppStore = create<AppState>()(
 
 ---
 
-## 5. Key Modules
+## 6. Key Modules
 
-### 5.1 Database Service (`services/database.ts`)
+### 6.1 Database Service (`services/database.ts`)
 
 ```typescript
 class DatabaseService {
@@ -214,14 +311,17 @@ class DatabaseService {
 
   // Tags
   async getTags(): Promise<Tag[]>;
-  async createTag(name: string, color?: string): Promise<Tag>;
+  async findOrCreateTag(name: string, color?: string): Promise<Tag>;
+  async findSimilarTags(name: string, threshold?: number): Promise<Tag[]>;
+  async mergeTags(sourceTagId: string, targetTagId: string): Promise<void>;
+  async deleteTag(id: string): Promise<void>;
 
   // Suggestions
   async getSuggestedProperties(tagIds: string[]): Promise<string[]>;
 }
 ```
 
-### 5.2 Storage Service (`services/storage.ts`)
+### 6.2 Storage Service (`services/storage.ts`)
 
 ```typescript
 class StorageService {
@@ -232,7 +332,7 @@ class StorageService {
 }
 ```
 
-### 5.3 LLM Service (`services/llm.ts`)
+### 6.3 LLM Service (`services/llm.ts`)
 
 ```typescript
 class LLMService {
@@ -250,7 +350,7 @@ interface DetectionResult {
 }
 ```
 
-### 5.4 Backup Service (`services/backup.ts`)
+### 6.4 Backup Service (`services/backup.ts`)
 
 ```typescript
 class BackupService {
@@ -264,7 +364,7 @@ class BackupService {
 
 ---
 
-## 6. Smart Suggestions Algorithm
+## 7. Smart Suggestions Algorithm
 
 ```typescript
 async function getSuggestedProperties(tagIds: string[]): Promise<PropertySuggestion[]> {
@@ -291,7 +391,7 @@ async function getSuggestedProperties(tagIds: string[]): Promise<PropertySuggest
 
 ---
 
-## 7. AI Detection Flow
+## 8. AI Detection Flow
 
 ```
 User taps "Detect" on attachment
@@ -345,14 +445,14 @@ Return JSON:
 
 ---
 
-## 8. Camera & Crop Flow
+## 9. Camera & Crop Flow
 
-### 8.1 Camera
+### 9.1 Camera
 - Use `expo-camera` or `react-native-camera`
 - Full controls: flash, zoom, focus, front/back
 - On capture → navigate to CropScreen
 
-### 8.2 Crop Tool
+### 9.2 Crop Tool
 - User draws a circle on the image
 - On gesture end:
   - Calculate bounding rectangle
@@ -363,30 +463,30 @@ Return JSON:
 
 ---
 
-## 9. Backup Strategy
+## 10. Backup Strategy
 
-### 9.1 Local Backup
+### 10.1 Local Backup
 1. Export SQLite database to JSON
 2. Copy all attachment files to temp dir
 3. Zip everything (DB JSON + attachments)
 4. Save to app's documents directory
 5. User can share via system share sheet
 
-### 9.2 Restore
+### 10.2 Restore
 1. User selects backup zip
 2. Unzip to temp
 3. Replace SQLite DB file
 4. Copy attachment files to correct location
 5. Reload app state
 
-### 9.3 Cloud (Future)
+### 10.3 Cloud (Future)
 - Google Drive via gog CLI
 - PostgreSQL sync (cloud DB)
 - MongoDB sync (cloud DB)
 
 ---
 
-## 10. CI/CD Pipeline
+## 11. CI/CD Pipeline
 
 ```yaml
 # .github/workflows/build.yml
@@ -426,7 +526,33 @@ jobs:
 
 ---
 
-## 11. Open Architectural Decisions
+## 12. Recommended Libraries
+
+### 12.1 Already Installed
+- `@nozbe/watermelondb` — SQLite ORM
+- `@nozbe/with-observables` — React bindings for WatermelonDB
+- `zustand` — State management
+- `react-native-mmkv` — Fast key-value storage
+- `react-native-reanimated` — Animations
+- `react-native-gesture-handler` — Gestures
+- `expo-camera` / `expo-image-picker` — Camera/gallery
+- `apisauce` — HTTP client
+
+### 12.2 To Install
+```bash
+npm install string-similarity fuse.js
+# OR
+yarn add string-similarity fuse.js
+```
+
+| Library | Purpose | Use Case |
+|---------|---------|----------|
+| `string-similarity` | Dice coefficient | Tag duplicate detection |
+| `fuse.js` | Fuzzy search | Inline tag suggestions |
+
+---
+
+## 13. Open Architectural Decisions
 
 | Decision | Options | Recommendation |
 |----------|---------|----------------|
@@ -436,17 +562,22 @@ jobs:
 | Navigation | React Navigation | React Navigation (standard) |
 | Forms | React Hook Form vs plain | React Hook Form |
 | Images | expo-image vs react-native-fast-image | expo-image |
+| Tag dedup | None vs app logic vs database constraints | **App logic** with normalized_name column |
+| Fuzzy search | fuse.js | For inline tag suggestions |
+| String similarity | string-similarity (Dice coefficient) | For duplicate detection (>80% match threshold) |
 
 ---
 
-## 12. Next Steps
+## 14. Next Steps
 
-1. Initialize Ignite project
-2. Set up WatermelonDB schema
-3. Implement basic CRUD
-4. Build camera flow
-5. Integrate LLM API
-6. Add backup system
+1. ~~Initialize Ignite project~~
+2. ~~Set up WatermelonDB schema~~ ← We are here
+3. Implement database service layer
+4. Build tag management screen
+5. Implement basic CRUD
+6. Build camera flow
+7. Integrate LLM API
+8. Add backup system
 
 ---
 

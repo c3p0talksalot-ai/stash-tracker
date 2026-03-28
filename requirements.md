@@ -12,7 +12,7 @@
 
 ## 2. User Stories
 
-### 2.1 Core Inventory
+### 2.1 Core Inventory ([Ticket #22](https://trello.com/c/hmYnuVkt))
 - As a user, I can add an item by taking a photo or selecting from gallery
 - As a user, I can manually create an item with properties
 - As a user, I can search for items by name, tag, or property
@@ -21,38 +21,38 @@
 - As a user, I can update any item property
 - As a user, I can delete an item (with confirmation)
 
-### 2.2 Tags & Organization
+### 2.2 Tags & Organization ([Ticket #23](https://trello.com/c/o7cGxbbX))
 - As a user, I can assign multiple tags to an item
 - As a user, I can create new tags
 - As a user, I can see tags sorted by frequency for smart suggestions
 - As a user, I can filter items by tag
 - As a user, I can see items grouped by tag with colored borders
 
-### 2.3 Properties
+### 2.3 Properties ([Ticket #24](https://trello.com/c/XJWe1PEW))
 - As a user, I can add key/value/unit properties to an item
 - As a user, I can edit or delete properties
 - As a user, I see smart property suggestions based on tag history
 - As a user, I can select from a pre-defined units list
 
-### 2.4 Attachments
+### 2.4 Attachments ([Ticket #26](https://trello.com/c/5eXW5NxE))
 - As a user, I can add multiple attachments (images, PDFs, docs) to an item
 - As a user, I can view attachments in-app or launch external app
 - As a user, I can delete attachments (with confirmation)
 - As a user, I can run "AI Detect" on an attachment to auto-suggest tags/properties
 
-### 2.5 Camera Flow
+### 2.5 Camera Flow ([Ticket #25](https://trello.com/c/RqoeVVXv))
 - As a user, I can take a photo with full camera controls
 - As a user, I can crop by drawing a circle, which auto-crops to bounding rectangle
 - As a user, I can accept or reject the crop
 - As a user, I can save the cropped image as a new item
 
-### 2.6 Statistics
+### 2.6 Statistics ([Ticket #28](https://trello.com/c/WZKPtknq))
 - As a user, I can see total item count
 - As a user, I can see tag distribution (pie/bar chart)
 - As a user, I can see total estimated value
 - As a user, I can see items added over time (timeline)
 
-### 2.7 Settings
+### 2.7 Settings ([Ticket #29](https://trello.com/c/9efivEkB))
 - As a user, I can adjust font size
 - As a user, I can toggle dark/light mode
 - As a user, I can set left/right handed mode
@@ -60,7 +60,7 @@
 - As a user, I can import backup
 - As a user, I can connect to cloud backup (Google Drive, etc.)
 
-### 2.8 Help
+### 2.8 Help ([Ticket #30](https://trello.com/c/A9sYfX5b))
 - As a user, I can read a help screen explaining all features
 - As a user, I can see tooltips on first launch
 
@@ -68,11 +68,18 @@
 
 ## 3. Data Model
 
+> See `app/database/schema.ts` for authoritative WatermelonDB schema.
+> **[Ticket #20](https://trello.com/c/7526XVX3)** - Data model design & migrations
+
 ### 3.1 Item
 ```typescript
 interface Item {
   id: string;              // UUID
-  name: string;            // User-defined name
+  name: string;           // Required
+  description?: string;    // Optional
+  location?: string;       // Optional (e.g., "garage shelf A")
+  purchaseDate?: number;   // Optional (Unix timestamp)
+  purchasePrice?: number;  // Optional (in cents)
   createdAt: number;       // Unix timestamp
   updatedAt: number;       // Unix timestamp
   tags: string[];          // Tag IDs
@@ -86,9 +93,12 @@ interface Item {
 ```typescript
 interface Property {
   id: string;
+  itemId: string;    // Foreign key
   key: string;       // e.g., "size", "color", "qty"
-  value: string | number | null;
+  value: string;      // Stored as string (infer type)
   unit?: string;     // e.g., "inches", "gallons"
+  createdAt: number;
+  updatedAt: number;
 }
 ```
 
@@ -96,23 +106,50 @@ interface Property {
 ```typescript
 interface Attachment {
   id: string;
-  uri: string;       // Local file path
-  mimeType: string;  // image/jpeg, application/pdf, etc.
-  filename: string;
-  size: number;
+  itemId: string;         // Foreign key
+  fileUri: string;        // Local file path
+  mimeType: string;       // image/jpeg, application/pdf, etc.
+  fileSize?: number;      // In bytes
+  thumbnailUri?: string;  // Optional thumbnail
+  originalFilename?: string;
+  altText?: string;       // Accessibility text
+  metadata: AttachmentMetadata[]; // Key-value pairs
   createdAt: number;
+  updatedAt: number;
 }
 ```
 
-### 3.4 Tag
+### 3.4 AttachmentMetadata
+```typescript
+interface AttachmentMetadata {
+  id: string;
+  attachmentId: string;  // Foreign key
+  key: string;           // e.g., "gps_lat", "camera_model"
+  value: string;
+  createdAt: number;
+  updatedAt: number;
+}
+```
+
+### 3.5 Tag
 ```typescript
 interface Tag {
   id: string;
-  name: string;      // e.g., "hardware", "plumbing"
-  color?: string;    // Hex color for border
-  usageCount: number; // For sorting suggestions
+  name: string;           // Display name (e.g., "hardware")
+  normalizedName: string;  // Lowercase, trimmed (for dedup)
+  slug: string;           // URL-safe (e.g., "hardware")
+  color?: string;          // Hex color for border
+  usageCount: number;      // Denormalized for sorting
+  createdAt: number;
+  updatedAt: number;
 }
 ```
+
+### 3.6 Tag Dedup Strategy
+- Tags are unique by `normalized_name` (case-insensitive)
+- On create: normalize → check exists → reuse or create
+- Similarity detection: show warnings for >80% match
+- Tag management screen: merge/rename/delete
 
 ### 3.5 UserSettings
 ```typescript
@@ -143,6 +180,8 @@ Example:
 ---
 
 ## 5. AI Detection Flow
+
+> **[Ticket #27](https://trello.com/c/CcBtDakw)** - AI Detection for auto-tagging
 
 1. User taps "Detect" on an attachment
 2. App sends attachment to LLM (local or API)
@@ -195,6 +234,8 @@ Example:
 - Ignite CLI for project setup + boilerplate
 - TypeScript
 
+> **[Ticket #21](https://trello.com/c/c0nDCgPW)** - Set up Ignite project with TypeScript
+
 ### 7.2 Database
 - SQLite (WatermelonDB or expo-sqlite)
 - Offline-first architecture
@@ -223,20 +264,23 @@ Example:
 
 ## 8. Screen Inventory
 
-| # | Screen | Purpose |
-|---|--------|---------|
-| 1 | Splash | App launch, logo |
-| 2 | Home/Dashboard | Stats, recent items, quick add |
-| 3 | Items List | Scrollable all items, filter by tag |
-| 4 | Item Detail | Full view, edit, attachments |
-| 5 | Item Editor | Add/edit item properties |
-| 6 | Camera | Capture photo |
-| 7 | Crop Tool | Draw circle → crop |
-| 8 | Gallery Picker | Select existing photo |
-| 9 | Search | Global search with filters |
-| 10 | AI Detection | Review LLM suggestions |
-| 11 | Settings | Font, theme, handedness, backup |
-| 12 | Help | User guide |
+> Covered by Tickets #22-#30 (Core CRUD, Tags, Properties, Camera, Attachments, AI, Stats, Settings, Help)
+
+| # | Screen | Purpose | Ticket |
+|---|--------|---------|--------|
+| 1 | Splash | App launch, logo | [#21](https://trello.com/c/c0nDCgPW) |
+| 2 | Home/Dashboard | Stats, recent items, quick add | [#28](https://trello.com/c/WZKPtknq) |
+| 3 | Items List | Scrollable all items, filter by tag | [#22](https://trello.com/c/hmYnuVkt) |
+| 4 | Item Detail | Full view, edit, attachments | [#22](https://trello.com/c/hmYnuVkt), [#26](https://trello.com/c/5eXW5NxE) |
+| 5 | Item Editor | Add/edit item properties | [#22](https://trello.com/c/hmYnuVkt), [#24](https://trello.com/c/XJWe1PEW) |
+| 6 | Camera | Capture photo | [#25](https://trello.com/c/RqoeVVXv) |
+| 7 | Crop Tool | Draw circle → crop | [#25](https://trello.com/c/RqoeVVXv) |
+| 8 | Gallery Picker | Select existing photo | [#25](https://trello.com/c/RqoeVVXv) |
+| 9 | Search | Global search with filters | [#22](https://trello.com/c/hmYnuVkt) |
+| 10 | AI Detection | Review LLM suggestions | [#27](https://trello.com/c/CcBtDakw) |
+| 11 | Tags Management | View, merge, rename, delete tags | [#23](https://trello.com/c/o7cGxbbX) |
+| 12 | Settings | Font, theme, handedness, backup | [#29](https://trello.com/c/9efivEkB) |
+| 13 | Help | User guide | [#30](https://trello.com/c/A9sYfX5b) |
 
 ---
 
@@ -250,7 +294,27 @@ Example:
 
 ---
 
-## 10. Open Questions
+## 10. Recommended Libraries
+
+### Already Installed
+- `@nozbe/watermelondb` — SQLite ORM
+- `zustand` — State management
+- `react-native-mmkv` — Fast key-value storage
+- `apisauce` — HTTP client
+
+### To Install
+```bash
+npm install string-similarity fuse.js
+```
+
+| Library | Purpose | Use Case |
+|---------|---------|----------|
+| `string-similarity` | Dice coefficient | Tag duplicate detection |
+| `fuse.js` | Fuzzy search | Inline tag suggestions |
+
+---
+
+## 11. Open Questions
 
 1. **Units**: Should we have a global units preference (imperial/metric)?
 2. **Offline AI**: Should we bundle a small model or always use API?
