@@ -1,15 +1,80 @@
-import { StyleSheet, View, Text, ScrollView, TouchableOpacity, TextStyle, ViewStyle } from "react-native"
+import { useState, useEffect } from "react"
+import { StyleSheet, View, Text, ScrollView, TouchableOpacity, TextStyle, ViewStyle, Alert } from "react-native"
 import { useAppTheme } from "@/theme/context"
-import type { InventoryItem } from "./ItemsListScreen"
+import { getItem, deleteItem } from "@/services/items"
+import type { AppStackScreenProps } from "@/navigators/navigationTypes"
 
-interface ItemDetailScreenProps {
-  item: InventoryItem
-  onBack: () => void
-  onEdit: () => void
+type Props = AppStackScreenProps<"ItemDetail">
+
+interface ItemData {
+  id: string
+  name: string
+  description?: string
+  location?: string
+  tags: string[]
+  properties: { key: string; value: string; unit?: string }[]
+  createdAt: number
 }
 
-export function ItemDetailScreen({ item, onBack, onEdit }: ItemDetailScreenProps) {
+export function ItemDetailScreen({ navigation, route }: Props) {
+  const { itemId } = route.params
   const { themed } = useAppTheme()
+  const [item, setItem] = useState<ItemData | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    loadItem()
+  }, [itemId])
+
+  const loadItem = async () => {
+    try {
+      const data = await getItem(itemId)
+      setItem(data)
+    } catch (e) {
+      console.error("Failed to load item:", e)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleEdit = () => {
+    navigation.navigate("ItemEditor", { itemId })
+  }
+
+  const handleDelete = () => {
+    Alert.alert("Delete Item", `Are you sure you want to delete "${item?.name}"?`, [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: async () => {
+          await deleteItem(itemId)
+          navigation.goBack()
+        },
+      },
+    ])
+  }
+
+  const onBack = () => navigation.goBack()
+
+  if (loading) {
+    return (
+      <View style={[themed($container), styles.container]}>
+        <Text style={themed($loadingText)}>Loading...</Text>
+      </View>
+    )
+  }
+
+  if (!item) {
+    return (
+      <View style={[themed($container), styles.container]}>
+        <TouchableOpacity onPress={onBack} style={themed($backButton)}>
+          <Text style={themed($backText)}>← Back</Text>
+        </TouchableOpacity>
+        <Text style={themed($errorText)}>Item not found</Text>
+      </View>
+    )
+  }
 
   return (
     <ScrollView style={[themed($container), styles.container]}>
@@ -17,13 +82,25 @@ export function ItemDetailScreen({ item, onBack, onEdit }: ItemDetailScreenProps
         <TouchableOpacity onPress={onBack} style={themed($backButton)}>
           <Text style={themed($backText)}>← Back</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={onEdit} style={themed($editButton)}>
-          <Text style={themed($editText)}>Edit</Text>
-        </TouchableOpacity>
+        <View style={themed($headerActions)}>
+          <TouchableOpacity onPress={handleEdit} style={themed($editButton)}>
+            <Text style={themed($editText)}>Edit</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleDelete} style={themed($deleteButton)}>
+            <Text style={themed($deleteText)}>Delete</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View style={themed($content)}>
         <Text style={themed($itemName)}>{item.name}</Text>
+
+        {item.description && (
+          <View style={themed($section)}>
+            <Text style={themed($sectionTitle)}>Description</Text>
+            <Text style={themed($description)}>{item.description}</Text>
+          </View>
+        )}
 
         {item.location && (
           <View style={themed($locationRow)}>
@@ -34,13 +111,17 @@ export function ItemDetailScreen({ item, onBack, onEdit }: ItemDetailScreenProps
 
         <View style={themed($section)}>
           <Text style={themed($sectionTitle)}>Tags</Text>
-          <View style={themed($tagsContainer)}>
-            {item.tags.map((tag) => (
-              <View key={tag} style={themed($tagBadge)}>
-                <Text style={themed($tagText)}>{tag}</Text>
-              </View>
-            ))}
-          </View>
+          {item.tags.length > 0 ? (
+            <View style={themed($tagsContainer)}>
+              {item.tags.map((tag) => (
+                <View key={tag} style={themed($tagBadge)}>
+                  <Text style={themed($tagText)}>{tag}</Text>
+                </View>
+              ))}
+            </View>
+          ) : (
+            <Text style={themed($noProperties)}>No tags</Text>
+          )}
         </View>
 
         <View style={themed($section)}>
@@ -90,6 +171,11 @@ const $backText: TextStyle = {
   color: "primary",
 }
 
+const $headerActions: ViewStyle = {
+  flexDirection: "row",
+  gap: 16,
+}
+
 const $editButton: ViewStyle = {
   padding: 8,
 }
@@ -98,6 +184,15 @@ const $editText: TextStyle = {
   fontSize: 16,
   color: "primary",
   fontWeight: "600",
+}
+
+const $deleteButton: ViewStyle = {
+  padding: 8,
+}
+
+const $deleteText: TextStyle = {
+  fontSize: 16,
+  color: "error",
 }
 
 const $content: ViewStyle = {
@@ -185,6 +280,26 @@ const $noProperties: TextStyle = {
 const $createdDate: TextStyle = {
   fontSize: 16,
   opacity: 0.7,
+}
+
+const $loadingText: TextStyle = {
+  fontSize: 16,
+  textAlign: "center",
+  marginTop: 40,
+  opacity: 0.5,
+}
+
+const $errorText: TextStyle = {
+  fontSize: 16,
+  textAlign: "center",
+  marginTop: 40,
+  opacity: 0.5,
+  color: "error",
+}
+
+const $description: TextStyle = {
+  fontSize: 16,
+  lineHeight: 24,
 }
 
 const styles = StyleSheet.create({

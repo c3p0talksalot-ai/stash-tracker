@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   StyleSheet,
   View,
@@ -11,26 +11,53 @@ import {
   ViewStyle,
 } from "react-native"
 import { useAppTheme } from "@/theme/context"
-import type { InventoryItem } from "./ItemsListScreen"
+import { getItem, createItem, updateItem } from "@/services/items"
+import type { AppStackScreenProps } from "@/navigators/navigationTypes"
 
-interface ItemEditorScreenProps {
-  item?: InventoryItem
-  onSave: (item: InventoryItem) => void
-  onCancel: () => void
-}
+type Props = AppStackScreenProps<"ItemEditor">
 
-export function ItemEditorScreen({ item, onSave, onCancel }: ItemEditorScreenProps) {
+export function ItemEditorScreen({ navigation, route }: Props) {
+  const { itemId } = route.params
   const { themed } = useAppTheme()
-  const [name, setName] = useState(item?.name || "")
-  const [location, setLocation] = useState(item?.location || "")
-  const [tags, setTags] = useState<string[]>(item?.tags || [])
+  const isEditing = !!itemId
+
+  const [name, setName] = useState("")
+  const [description, setDescription] = useState("")
+  const [location, setLocation] = useState("")
+  const [tags, setTags] = useState<string[]>([])
   const [newTag, setNewTag] = useState("")
-  const [properties, setProperties] = useState(item?.properties || [])
+  const [properties, setProperties] = useState<{ key: string; value: string; unit?: string }[]>([])
   const [newPropKey, setNewPropKey] = useState("")
   const [newPropValue, setNewPropValue] = useState("")
   const [newPropUnit, setNewPropUnit] = useState("")
+  const [loading, setLoading] = useState(isEditing)
+
+  useEffect(() => {
+    if (itemId) {
+      loadItem()
+    }
+  }, [itemId])
+
+  const loadItem = async () => {
+    try {
+      const item = await getItem(itemId)
+      if (item) {
+        setName(item.name)
+        setDescription(item.description || "")
+        setLocation(item.location || "")
+        setTags(item.tags)
+        setProperties(item.properties)
+      }
+    } catch (e) {
+      console.error("Failed to load item:", e)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const availableTags = ["hardware", "plumbing", "electronics", "tools", "lighting", "outdoor", "kitchen", "automotive"]
+
+  const onCancel = () => navigation.goBack()
 
   const addTag = (tag: string) => {
     if (tag && !tags.includes(tag)) {
@@ -56,22 +83,35 @@ export function ItemEditorScreen({ item, onSave, onCancel }: ItemEditorScreenPro
     setProperties(properties.filter((_, i) => i !== index))
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!name.trim()) {
       Alert.alert("Error", "Please enter an item name")
       return
     }
 
-    const newItem: InventoryItem = {
-      id: item?.id || Date.now().toString(),
-      name: name.trim(),
-      tags,
-      properties,
-      location: location.trim() || undefined,
-      createdAt: item?.createdAt || Date.now(),
+    try {
+      if (isEditing && itemId) {
+        await updateItem(itemId, {
+          name: name.trim(),
+          description: description.trim(),
+          location: location.trim(),
+          tags,
+          properties,
+        })
+      } else {
+        await createItem({
+          name: name.trim(),
+          description: description.trim(),
+          location: location.trim(),
+          tags,
+          properties,
+        })
+      }
+      navigation.goBack()
+    } catch (e) {
+      console.error("Failed to save item:", e)
+      Alert.alert("Error", "Failed to save item")
     }
-
-    onSave(newItem)
   }
 
   return (
@@ -106,6 +146,18 @@ export function ItemEditorScreen({ item, onSave, onCancel }: ItemEditorScreenPro
             onChangeText={setLocation}
             placeholder="e.g., Garage, Closet"
             placeholderTextColor="#999"
+          />
+        </View>
+
+        <View style={themed($field)}>
+          <Text style={themed($label)}>Description</Text>
+          <TextInput
+            style={[themed($input), { minHeight: 80, textAlignVertical: "top" }]}
+            value={description}
+            onChangeText={setDescription}
+            placeholder="Enter description"
+            placeholderTextColor="#999"
+            multiline
           />
         </View>
 

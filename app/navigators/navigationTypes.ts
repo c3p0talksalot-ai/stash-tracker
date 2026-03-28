@@ -25,6 +25,16 @@ export type AppStackParamList = {
   ItemsList: undefined
   ItemDetail: { itemId: string }
   ItemEditor: { itemId?: string }
+  // Camera & Gallery screens
+  NewItemCameraScan: undefined
+  GalleryPicker: { mode: "single" | "multi" }
+  Crop: { 
+    imageUri: string; 
+    mode: "single" | "multi"; 
+    images?: string[]; 
+    currentIndex?: number;
+    croppedResults?: string[];
+  }
   // 🔥 Your screens go here
   // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
 }

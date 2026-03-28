@@ -13,6 +13,9 @@ import { HomeScreen } from "@/screens/HomeScreen"
 import { ItemsListScreen } from "@/screens/ItemsListScreen"
 import { ItemDetailScreen } from "@/screens/ItemDetailScreen"
 import { ItemEditorScreen } from "@/screens/ItemEditorScreen"
+import { NewItemCameraScanScreen } from "@/screens/NewItemCameraScanScreen"
+import { GalleryPickerScreen } from "@/screens/GalleryPickerScreen"
+import { CropScreen } from "@/screens/CropScreen"
 import { useAppTheme } from "@/theme/context"
 
 import type { AppStackParamList, NavigationProps } from "./navigationTypes"
@@ -47,6 +50,9 @@ const AppStack = () => {
       <Stack.Screen name="ItemsList" component={ItemsListScreen} />
       <Stack.Screen name="ItemDetail" component={ItemDetailScreen} />
       <Stack.Screen name="ItemEditor" component={ItemEditorScreen} />
+      <Stack.Screen name="NewItemCameraScan" component={NewItemCameraScanScreen} />
+      <Stack.Screen name="GalleryPicker" component={GalleryPickerScreen} />
+      <Stack.Screen name="Crop" component={CropScreen} />
     </Stack.Navigator>
   )
 }
