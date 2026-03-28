@@ -61,7 +61,7 @@ export function ItemDetailScreen({ item, onBack, onEdit }: ItemDetailScreenProps
 
         <View style={themed($section)}>
           <Text style={themed($sectionTitle)}>Created</Text>
-          <Text style={themed($createdDate)}>{item.createdAt}</Text>
+          <Text style={themed($createdDate)}>{new Date(item.createdAt).toLocaleDateString()}</Text>
         </View>
       </View>
     </ScrollView>

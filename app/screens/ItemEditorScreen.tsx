@@ -68,7 +68,7 @@ export function ItemEditorScreen({ item, onSave, onCancel }: ItemEditorScreenPro
       tags,
       properties,
       location: location.trim() || undefined,
-      createdAt: item?.createdAt || new Date().toISOString().split("T")[0],
+      createdAt: item?.createdAt || Date.now(),
     }
 
     onSave(newItem)

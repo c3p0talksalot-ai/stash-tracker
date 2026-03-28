@@ -1,6 +1,6 @@
-import { Q, Query } from "@nozbe/watermelondb"
-import { database, Item, Property, Tag, ItemTag } from "./index"
-import type { Model, Relation, Record } from "@nozbe/watermelondb"
+import { Q } from "@nozbe/watermelondb"
+import { database, Item, Property, Tag, ItemTag } from "../database"
+import type { Model } from "@nozbe/watermelondb"
 
 export interface ItemInput {
   name: string
@@ -27,12 +27,14 @@ export interface ItemOutput {
 
 // Convert database model to plain object
 async function itemToOutput(item: Item): Promise<ItemOutput> {
-  const props = await item.properties.fetch()
+  // Get properties via direct query
+  const propsCollection = database.get<Property>("properties")
+  const props = await propsCollection.query(Q.where("item_id", item.id)).fetch()
   
   // Get tags through item_tags join table
   const itemTagsCollection = database.get<ItemTag>("item_tags")
   const itemTags = await itemTagsCollection.query(Q.where("item_id", item.id)).fetch()
-  const tagIds = itemTags.map((it: ItemTag) => it.tagId)
+  const tagIds = itemTags.map((it) => it.tagId)
   
   return {
     id: item.id,
@@ -42,13 +44,13 @@ async function itemToOutput(item: Item): Promise<ItemOutput> {
     purchaseDate: item.purchaseDate,
     purchasePrice: item.purchasePrice,
     tags: tagIds,
-    properties: props.map((p: Property) => ({
+    properties: props.map((p) => ({
       key: p.key,
       value: p.value,
       unit: p.unit,
     })),
-    createdAt: item.createdAt,
-    updatedAt: item.updatedAt,
+    createdAt: item.createdAt.getTime(),
+    updatedAt: item.updatedAt.getTime(),
   }
 }
 
@@ -58,7 +60,7 @@ export async function createItem(input: ItemInput): Promise<ItemOutput> {
   const itemsCollection = database.get<Item>("items")
   
   const newItem = await database.write(async () => {
-    const item = await itemsCollection.create((record: Item) => {
+    const item = await itemsCollection.create((record) => {
       record.name = input.name
       record.description = input.description || ""
       record.location = input.location || ""
@@ -70,7 +72,7 @@ export async function createItem(input: ItemInput): Promise<ItemOutput> {
     if (input.properties && input.properties.length > 0) {
       const propsCollection = database.get<Property>("properties")
       for (const prop of input.properties) {
-        await propsCollection.create((p: Property) => {
+        await propsCollection.create((p) => {
           p.itemId = item.id
           p.key = prop.key
           p.value = prop.value
@@ -83,7 +85,7 @@ export async function createItem(input: ItemInput): Promise<ItemOutput> {
     if (input.tags && input.tags.length > 0) {
       const itemTagsCollection = database.get<ItemTag>("item_tags")
       for (const tagId of input.tags) {
-        await itemTagsCollection.create((it: ItemTag) => {
+        await itemTagsCollection.create((it) => {
           it.itemId = item.id
           it.tagId = tagId
         })
@@ -118,7 +120,7 @@ export async function updateItem(id: string, input: Partial<ItemInput>): Promise
     const item = await itemsCollection.find(id)
     
     await database.write(async () => {
-      await item.update((record: Item) => {
+      await item.update((record) => {
         if (input.name !== undefined) record.name = input.name
         if (input.description !== undefined) record.description = input.description
         if (input.location !== undefined) record.location = input.location
@@ -140,7 +142,8 @@ export async function deleteItem(id: string): Promise<boolean> {
     
     await database.write(async () => {
       // Delete related properties
-      const props = await item.properties.fetch()
+      const propsCollection = database.get<Property>("properties")
+      const props = await propsCollection.query(Q.where("item_id", id)).fetch()
       for (const prop of props) {
         await prop.destroyPermanently()
       }
@@ -173,7 +176,7 @@ export async function searchItems(query: string): Promise<ItemOutput[]> {
 export async function getItemsByTag(tagId: string): Promise<ItemOutput[]> {
   const itemTagsCollection = database.get<ItemTag>("item_tags")
   const itemTags = await itemTagsCollection.query(Q.where("tag_id", tagId)).fetch()
-  const itemIds = itemTags.map((it: ItemTag) => it.itemId)
+  const itemIds = itemTags.map((it) => it.itemId)
   
   if (itemIds.length === 0) return []
   
