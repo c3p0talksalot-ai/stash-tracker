@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect, useCallback } from "react"
 import {
   StyleSheet,
   View,
@@ -8,8 +8,11 @@ import {
   TouchableOpacity,
   TextStyle,
   ViewStyle,
+  Alert,
 } from "react-native"
+import { useFocusEffect } from "@react-navigation/native"
 import { useAppTheme } from "@/theme/context"
+import { getAllItems, searchItems, deleteItem } from "@/services/items"
 
 export interface InventoryItem {
   id: string
@@ -17,51 +20,70 @@ export interface InventoryItem {
   tags: string[]
   properties: { key: string; value: string; unit?: string }[]
   location?: string
-  createdAt: string
+  createdAt: number
 }
 
-const mockItems: InventoryItem[] = [
-  {
-    id: "1",
-    name: "Power Drill",
-    tags: ["hardware", "tools"],
-    properties: [{ key: "brand", value: "DeWalt" }, { key: "voltage", value: "20", unit: "V" }],
-    location: "Garage",
-    createdAt: "2024-01-15",
-  },
-  {
-    id: "2",
-    name: "Hose Fitting Set",
-    tags: ["plumbing", "outdoor"],
-    properties: [{ key: "pieces", value: "12" }],
-    location: "Garden Shed",
-    createdAt: "2024-02-20",
-  },
-  {
-    id: "3",
-    name: "LED Light Strips",
-    tags: ["electronics", "lighting"],
-    properties: [{ key: "length", value: "5", unit: "m" }, { key: "color", value: "RGB" }],
-    location: "Closet",
-    createdAt: "2024-03-10",
-  },
-]
-
-export function ItemsListScreen() {
+export function ItemsListScreen({ navigation }: any) {
   const { themed } = useAppTheme()
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedTag, setSelectedTag] = useState<string | null>(null)
+  const [items, setItems] = useState<InventoryItem[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const allTags = Array.from(new Set(mockItems.flatMap((item) => item.tags)))
+  const loadItems = useCallback(async () => {
+    try {
+      setLoading(true)
+      let loadedItems: InventoryItem[]
+      if (searchQuery) {
+        loadedItems = await searchItems(searchQuery)
+      } else {
+        loadedItems = await getAllItems()
+      }
+      setItems(loadedItems)
+    } catch (error) {
+      console.error("Failed to load items:", error)
+    } finally {
+      setLoading(false)
+    }
+  }, [searchQuery])
 
-  const filteredItems = mockItems.filter((item) => {
-    const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase())
+  useFocusEffect(
+    useCallback(() => {
+      loadItems()
+    }, [loadItems])
+  )
+
+  const allTags = Array.from(new Set(items.flatMap((item) => item.tags)))
+
+  const filteredItems = items.filter((item) => {
     const matchesTag = selectedTag ? item.tags.includes(selectedTag) : true
-    return matchesSearch && matchesTag
+    return matchesTag
   })
 
+  const handleDelete = (item: InventoryItem) => {
+    Alert.alert(
+      "Delete Item",
+      `Are you sure you want to delete "${item.name}"?`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            await deleteItem(item.id)
+            loadItems()
+          },
+        },
+      ]
+    )
+  }
+
   const renderItem = ({ item }: { item: InventoryItem }) => (
-    <TouchableOpacity style={themed($itemCard)}>
+    <TouchableOpacity
+      style={themed($itemCard)}
+      onPress={() => navigation.navigate("ItemDetail", { itemId: item.id })}
+      onLongPress={() => handleDelete(item)}
+    >
       <Text style={themed($itemName)}>{item.name}</Text>
       <View style={themed($tagsRow)}>
         {item.tags.map((tag) => (
@@ -84,6 +106,7 @@ export function ItemsListScreen() {
           placeholderTextColor="#999"
           value={searchQuery}
           onChangeText={setSearchQuery}
+          onSubmitEditing={loadItems}
         />
       </View>
 
@@ -109,13 +132,23 @@ export function ItemsListScreen() {
         ))}
       </View>
 
-      <FlatList
-        data={filteredItems}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        contentContainerStyle={themed($listContent)}
-        ListEmptyComponent={<Text style={themed($emptyText)}>No items found</Text>}
-      />
+      {loading ? (
+        <View style={themed($emptyTextContainer)}>
+          <Text style={themed($emptyText)}>Loading...</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={filteredItems}
+          keyExtractor={(item) => item.id}
+          renderItem={renderItem}
+          contentContainerStyle={themed($listContent)}
+          ListEmptyComponent={
+            <Text style={themed($emptyText)}>
+              {searchQuery ? "No items match your search" : "No items yet - tap + to add one"}
+            </Text>
+          }
+        />
+      )}
     </View>
   )
 }
@@ -209,6 +242,12 @@ const $tagText: TextStyle = {
 const $location: TextStyle = {
   fontSize: 14,
   opacity: 0.7,
+}
+
+const $emptyTextContainer: ViewStyle = {
+  flex: 1,
+  justifyContent: "center",
+  alignItems: "center",
 }
 
 const $emptyText: TextStyle = {

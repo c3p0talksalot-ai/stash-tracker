@@ -10,6 +10,9 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import Config from "@/config"
 import { ErrorBoundary } from "@/screens/ErrorScreen/ErrorBoundary"
 import { HomeScreen } from "@/screens/HomeScreen"
+import { ItemsListScreen } from "@/screens/ItemsListScreen"
+import { ItemDetailScreen } from "@/screens/ItemDetailScreen"
+import { ItemEditorScreen } from "@/screens/ItemEditorScreen"
 import { useAppTheme } from "@/theme/context"
 
 import type { AppStackParamList, NavigationProps } from "./navigationTypes"
@@ -38,12 +41,12 @@ const AppStack = () => {
           backgroundColor: colors.background,
         },
       }}
-      initialRouteName="Home"
+      initialRouteName="ItemsList"
     >
       <Stack.Screen name="Home" component={HomeScreen} />
-
-      {/** 🔥 Your screens go here */}
-      {/* IGNITE_GENERATOR_ANCHOR_APP_STACK_SCREENS */}
+      <Stack.Screen name="ItemsList" component={ItemsListScreen} />
+      <Stack.Screen name="ItemDetail" component={ItemDetailScreen} />
+      <Stack.Screen name="ItemEditor" component={ItemEditorScreen} />
     </Stack.Navigator>
   )
 }
