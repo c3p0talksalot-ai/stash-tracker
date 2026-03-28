@@ -5,6 +5,9 @@
   "main": "index.tsx",
   "scripts": {
     "start": "expo start --dev-client",
+    "an": "expo run:android",
+    "list": "lsof -i :8080",
+    "kill": "kill -9 $(lsof -t -i:8080)",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",

@@ -5,7 +5,9 @@
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "jsx": "react-native",
-    "customConditions": ["react-native"],
+    "customConditions": [
+      "react-native"
+    ],
     "module": "esnext",
     "moduleResolution": "bundler",
     "strict": true,
@@ -37,9 +39,7 @@
   },
   "include": [
     "**/*.ts",
-    "**/*.tsx",
-    ".expo/types/**/*.ts",
-    "expo-env.d.ts"
+    "**/*.tsx"
   ],
   "exclude": [
     "node_modules",
