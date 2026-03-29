@@ -119,7 +119,8 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
         placeholderTextColor={theme.colors.text}
         value={searchQuery}
         onChangeText={setSearchQuery}
-        onBlur={() => !searchQuery && setIsSearchActive(false)}
+        onSubmitEditing={() => console.log("Search:", searchQuery)}
+        returnKeyType="search"
         autoFocus
       />
     </View>
