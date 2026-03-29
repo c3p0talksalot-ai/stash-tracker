@@ -2,7 +2,7 @@ import { FC, useState, useRef, useCallback } from "react"
 import { FlatList, TextInput, TextStyle, View, ViewStyle, TouchableOpacity, Alert } from "react-native"
 import { useFocusEffect } from "@react-navigation/native"
 
-import { PressableIcon } from "@/components/Icon"
+import { Icon, PressableIcon } from "@/components/Icon"
 import { Screen } from "@/components/Screen"
 import { Text } from "@/components/Text"
 import { useSettings } from "@/context/SettingsContext"
@@ -122,6 +122,10 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
         onChangeText={setSearchQuery}
         onSubmitEditing={() => console.log("Search:", searchQuery)}
         returnKeyType="search"
+              onBlur={() => {
+                setSearchQuery("")
+                setIsSearchActive(false)
+              }}
         autoFocus
       />
     </View>
@@ -135,7 +139,7 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
             style={themed($addButton)}
             onPress={handleAddNew}
           >
-            <Text preset="heading" style={{ color: theme.colors.tint, fontSize: 28 }}>+</Text>
+            <Text style={{ color: theme.colors.tint, fontSize: 26, fontWeight: "300", lineHeight: 28 }}>+</Text>
           </TouchableOpacity>
           <PressableIcon
             icon="settings"
@@ -189,7 +193,7 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
           style={themed($addButton)}
           onPress={handleAddNew}
         >
-          <Text preset="heading" style={{ color: theme.colors.tint, fontSize: 28 }}>+</Text>
+          <Text style={{ color: theme.colors.tint, fontSize: 26, fontWeight: "300", lineHeight: 28 }}>+</Text>
         </TouchableOpacity>
       </View>
     )
@@ -200,30 +204,6 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
       <View style={themed($contentArea)}>
         <View style={themed($header)}>
           <Text preset="heading">My Items</Text>
-          {isSearchActive ? (
-            <TextInput
-              ref={searchInputRef}
-              style={themed($headerSearchInput)}
-              placeholder="Search..."
-              placeholderTextColor={colors.text}
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              onSubmitEditing={() => {
-                // Search triggered - filter items
-                console.log("Search:", searchQuery)
-              }}
-              returnKeyType="search"
-              autoFocus
-            />
-          ) : (
-            <PressableIcon
-              icon="view"
-              color={theme.colors.text}
-              size={24}
-              containerStyle={themed($searchIcon)}
-              onPress={handleSearchToggle}
-            />
-          )}
         </View>
 
         <FlatList
@@ -360,10 +340,9 @@ const $addButton: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   height: 44,
   alignItems: "center",
   justifyContent: "center",
-  backgroundColor: colors.card,
+  backgroundColor: colors.tint,
   borderRadius: 22,
-  borderWidth: 2,
-  borderColor: colors.tint,
+  zIndex: 1000,
 })
 
 const $navIconAdd: ThemedStyle<ViewStyle> = ({ spacing }) => ({
