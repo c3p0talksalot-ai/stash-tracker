@@ -204,16 +204,16 @@ export function ItemEditorScreen({ navigation, route }: Props) {
       if (isEditing && itemId) {
         await updateItem(itemId, {
           name: name,
-          description: description.trim(),
-          location: location.trim(),
+          description: description,
+          location: location,
           tags,
           properties,
         })
       } else {
         await createItem({
           name: name,
-          description: description.trim(),
-          location: location.trim(),
+          description: description,
+          location: location,
           tags,
           properties,
         })
