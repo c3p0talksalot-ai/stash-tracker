@@ -278,15 +278,17 @@ const $searchInput: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
 
 const $bottomNav: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   position: "absolute",
-  bottom: spacing.lg,
+  bottom: 0,
   left: 0,
   right: 0,
+  height: 80,
   flexDirection: "row",
   justifyContent: "space-between",
   alignItems: "center",
   paddingHorizontal: spacing.xl,
   paddingVertical: spacing.md,
-  backgroundColor: colors.background,
+  backgroundColor: "cyan",
+  zIndex: 999,
 })
 
 const $navSideInner: ThemedStyle<ViewStyle> = ({ spacing }) => ({
