@@ -45,6 +45,9 @@ export function ItemEditorScreen({ navigation, route }: Props) {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const lastSaveTime = useRef(0)
+  const nameRef = useRef("")
+  const locationRef = useRef("")
+  const descriptionRef = useRef("")
   
   const isInitialLoad = useRef(true)
   const originalItemData = useRef<string>("")
@@ -202,17 +205,17 @@ export function ItemEditorScreen({ navigation, route }: Props) {
     try {
       if (isEditing && itemId) {
         console.log("updateItem called with", { name }); console.log("!!! UPDATE CALL, name:", name); await updateItem(itemId, {
-          name: name,
-          description: description,
-          location: location,
+          name: nameRef.current || name,
+          description: descriptionRef.current || description,
+          location: locationRef.current || location,
           tags,
           properties,
         })
       } else {
         await createItem({
-          name: name,
-          description: description,
-          location: location,
+          name: nameRef.current || name,
+          description: descriptionRef.current || description,
+          location: locationRef.current || location,
           tags,
           properties,
         })
@@ -330,7 +333,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
           <TextInput
             style={themed($input)}
             value={name}
-            onChangeText={(text) => { setName(text) }}
+            onChangeText={(text) => { setName(text); nameRef.current = text }}
             placeholder="Enter item name"
             placeholderTextColor={colors.textDim}
             onBlur={handleBlur}
@@ -342,7 +345,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
           <TextInput
             style={themed($input)}
             value={location}
-            onChangeText={(text) => { setLocation(text) }}
+            onChangeText={(text) => { setLocation(text); locationRef.current = text }}
             placeholder="e.g., Garage, Closet"
             placeholderTextColor={colors.textDim}
             onBlur={handleBlur}
@@ -354,7 +357,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
           <TextInput
             style={[themed($input), { minHeight: 80, textAlignVertical: "top" }]}
             value={description}
-            onChangeText={(text) => { setDescription(text) }}
+            onChangeText={(text) => { setDescription(text); descriptionRef.current = text }}
             placeholder="Enter description"
             placeholderTextColor={colors.textDim}
             multiline
