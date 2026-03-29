@@ -204,6 +204,19 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
       <View style={themed($contentArea)}>
         <View style={themed($header)}>
           <Text preset="heading">My Items</Text>
+          {isSearchActive && (
+            <TextInput
+              ref={searchInputRef}
+              style={themed($headerSearchInput)}
+              placeholder="Search..."
+              placeholderTextColor={colors.text}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              onSubmitEditing={() => console.log("Search:", searchQuery)}
+              returnKeyType="search"
+              autoFocus
+            />
+          )}
         </View>
 
         <FlatList
