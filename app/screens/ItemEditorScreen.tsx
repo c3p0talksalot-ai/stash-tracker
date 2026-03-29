@@ -61,18 +61,12 @@ export function ItemEditorScreen({ navigation, route }: Props) {
     }
   }, [name, description, location, tags, properties, loading, isEditing, getCurrentDataHash])
 
-  // Autosave with debounce
-  useEffect(() => {
-    if (!isInitialLoad.current && autosave && hasUnsavedChanges && !isSaving && !loading && isEditing) {
-      const timer = setTimeout(async () => {
-        if (autosave && hasUnsavedChanges && !isSaving) {
-          await handleSaveInternal()
-        }
-      }, 1000)
-      return () => clearTimeout(timer)
+  // Save on blur - no debounce, save immediately when field loses focus
+  const handleBlur = useCallback(() => {
+    if (autosave && hasUnsavedChanges && !isSaving && isEditing && !isInitialLoad.current) {
+      handleSaveInternal()
     }
-    return undefined
-  }, [autosave, hasUnsavedChanges, isSaving, loading, isEditing])
+  }, [autosave, hasUnsavedChanges, isSaving, isEditing])
 
   // Navigation warning for unsaved changes
   useEffect(() => {
@@ -171,6 +165,10 @@ export function ItemEditorScreen({ navigation, route }: Props) {
       setNewPropKey("")
       setNewPropValue("")
       setNewPropUnit("")
+      // Trigger save after adding property
+      if (autosave && isEditing && !isSaving) {
+        handleSaveInternal()
+      }
     }
   }
 
@@ -322,6 +320,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
             onChangeText={setName}
             placeholder="Enter item name"
             placeholderTextColor={colors.textDim}
+            onBlur={handleBlur}
           />
         </View>
 
@@ -333,6 +332,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
             onChangeText={setLocation}
             placeholder="e.g., Garage, Closet"
             placeholderTextColor={colors.textDim}
+            onBlur={handleBlur}
           />
         </View>
 
@@ -345,6 +345,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
             placeholder="Enter description"
             placeholderTextColor={colors.textDim}
             multiline
+            onBlur={handleBlur}
           />
         </View>
 
@@ -364,7 +365,8 @@ export function ItemEditorScreen({ navigation, route }: Props) {
                 onChangeText={setNewTag}
                 placeholder="+"
                 placeholderTextColor={colors.textDim}
-                onSubmitEditing={() => addTag(newTag)}
+                onSubmitEditing={() => { addTag(newTag); handleBlur(); }}
+                onBlur={handleBlur}
               />
             </View>
           </View>
