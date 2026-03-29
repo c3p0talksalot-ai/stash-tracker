@@ -141,6 +141,13 @@ export function ItemEditorScreen({ navigation, route }: Props) {
     // Already in edit mode, no action needed
   }
 
+  const handleAddTagFromMenu = () => {
+    setMenuVisible(false)
+    if (newTag.trim()) {
+      addTag(newTag.trim())
+    }
+  }
+
   const toggleMenu = () => {
     setMenuVisible(!menuVisible)
   }
@@ -170,6 +177,9 @@ export function ItemEditorScreen({ navigation, route }: Props) {
               <Icon icon="back" size={20} />
             </TouchableOpacity>
             <View style={themed($menuDivider)} />
+            <TouchableOpacity style={themed($menuItem)} onPress={handleAddTagFromMenu}>
+              <Icon icon="check" size={20} />
+            </TouchableOpacity>
             <TouchableOpacity style={themed($menuItem)} onPress={handleEdit}>
               <Icon icon="settings" size={20} />
             </TouchableOpacity>
@@ -220,22 +230,20 @@ export function ItemEditorScreen({ navigation, route }: Props) {
           <View style={themed($tagsContainer)}>
             {tags.map((tag) => (
               <TouchableOpacity key={tag} onPress={() => removeTag(tag)} style={themed($tagChip)}>
-                <Text style={themed($tagChipText)}>{tag} ✕</Text>
+                <Icon icon="x" size={14} />
+                <Text style={themed($tagChipText)}>{tag}</Text>
               </TouchableOpacity>
             ))}
-          </View>
-          <View style={themed($tagInputRow)}>
-            <TextInput
-              style={themed($tagInput)}
-              value={newTag}
-              onChangeText={setNewTag}
-              placeholder="Add tag"
-              placeholderTextColor="#999"
-              onSubmitEditing={() => addTag(newTag)}
-            />
-            <TouchableOpacity onPress={() => addTag(newTag)} style={themed($addButton)}>
-              <Text style={themed($addButtonText)}>Add</Text>
-            </TouchableOpacity>
+            <View style={themed($tagInputContainer)}>
+              <TextInput
+                style={themed($tagInputInline)}
+                value={newTag}
+                onChangeText={setNewTag}
+                placeholder="+"
+                placeholderTextColor="#999"
+                onSubmitEditing={() => addTag(newTag)}
+              />
+            </View>
           </View>
           <Text style={themed($hint)}>Suggestions: {availableTags.slice(0, 4).join(", ")}</Text>
         </View>
@@ -359,15 +367,38 @@ const $tagsContainer: ViewStyle = {
 }
 
 const $tagChip: ViewStyle = {
-  paddingHorizontal: 12,
+  flexDirection: "row",
+  alignItems: "center",
+  paddingLeft: 10,
+  paddingRight: 8,
   paddingVertical: 6,
   borderRadius: 16,
   backgroundColor: "primary",
+  gap: 4,
 }
 
 const $tagChipText: TextStyle = {
   fontSize: 14,
   color: "white",
+}
+
+const $tagInputContainer: ViewStyle = {
+  paddingHorizontal: 10,
+  paddingVertical: 6,
+  borderRadius: 16,
+  borderWidth: 1,
+  borderColor: "border",
+  borderStyle: "dashed",
+  minWidth: 40,
+  alignItems: "center",
+  justifyContent: "center",
+}
+
+const $tagInputInline: TextStyle = {
+  fontSize: 14,
+  color: "text",
+  padding: 0,
+  minWidth: 30,
 }
 
 const $tagInputRow: ViewStyle = {
