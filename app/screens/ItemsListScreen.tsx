@@ -58,7 +58,7 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
   )
 
   const handleItemPress = (itemId: string) => {
-    navigation.navigate("ItemDetail", { itemId })
+    navigation.navigate("ItemEditor", { itemId })
   }
 
   const handleDeleteItem = (item: ItemData) => {
