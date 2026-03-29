@@ -202,7 +202,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
     setIsSaving(true)
     try {
       if (isEditing && itemId) {
-        console.log("updateItem called with", { name }); await updateItem(itemId, {
+        Alert.alert("DEBUG", "Saving name: " + name); console.log("updateItem called with", { name }); await updateItem(itemId, {
           name: name,
           description: description,
           location: location,
