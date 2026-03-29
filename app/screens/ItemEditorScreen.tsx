@@ -523,13 +523,13 @@ const $tagChip: ViewStyle = {
   paddingRight: 8,
   paddingVertical: 6,
   borderRadius: 16,
-  backgroundColor: "primary",
+  backgroundColor: colors.tint,
   gap: 4,
 }
 
 const $tagChipText: TextStyle = {
   fontSize: 14,
-  color: "white",
+  color: colors.textInverse,
 }
 
 const $tagInputContainer: ViewStyle = {
@@ -537,7 +537,7 @@ const $tagInputContainer: ViewStyle = {
   paddingVertical: 6,
   borderRadius: 16,
   borderWidth: 1,
-  borderColor: "border",
+  borderColor: colors.border,
   borderStyle: "dashed",
   minWidth: 40,
   alignItems: "center",
@@ -546,7 +546,7 @@ const $tagInputContainer: ViewStyle = {
 
 const $tagInputInline: TextStyle = {
   fontSize: 14,
-  color: "text",
+  color: colors.text,
   padding: 0,
   minWidth: 30,
 }
@@ -566,9 +566,9 @@ const $tagInput: TextStyle = {
   borderColor: colors.border,
 })
 =======
-  backgroundColor: "card",
+  backgroundColor: colors.backgroundCard,
   borderWidth: 1,
-  borderColor: "border",
+  borderColor: colors.border,
 >>>>>>> Stashed changes
 }
 
@@ -583,12 +583,12 @@ const $addButton: ViewStyle = {
   paddingHorizontal: 16,
   paddingVertical: 12,
   borderRadius: 8,
-  backgroundColor: "primary",
+  backgroundColor: colors.tint,
 }
 
 const $addButtonText: TextStyle = {
   fontSize: 14,
-  color: "white",
+  color: colors.textInverse,
   fontWeight: "600",
 }
 
@@ -598,7 +598,7 @@ const $propertyRow: ViewStyle = {
   alignItems: "center",
   padding: 12,
   borderRadius: 8,
-  backgroundColor: "card",
+  backgroundColor: colors.backgroundCard,
   marginBottom: 8,
 }
 
