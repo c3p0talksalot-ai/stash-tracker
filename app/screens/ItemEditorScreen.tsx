@@ -367,7 +367,7 @@ const $tagsContainer: ViewStyle = {
   marginBottom: 8,
 }
 
-const $tagChip: ViewStyle = {
+const $tagChip: ThemedStyle<ViewStyle> = ({ colors }) => ({
   flexDirection: "row",
   alignItems: "center",
   paddingLeft: 10,
@@ -376,14 +376,14 @@ const $tagChip: ViewStyle = {
   borderRadius: 16,
   backgroundColor: colors.tint,
   gap: 4,
-}
+})
 
-const $tagChipText: TextStyle = {
+const $tagChipText: ThemedStyle<TextStyle> = ({ colors }) => ({
   fontSize: 14,
   color: colors.textInverse,
-}
+})
 
-const $tagInputContainer: ViewStyle = {
+const $tagInputContainer: ThemedStyle<ViewStyle> = ({ colors }) => ({
   paddingHorizontal: 10,
   paddingVertical: 6,
   borderRadius: 16,
@@ -393,21 +393,21 @@ const $tagInputContainer: ViewStyle = {
   minWidth: 40,
   alignItems: "center",
   justifyContent: "center",
-}
+})
 
-const $tagInputInline: TextStyle = {
+const $tagInputInline: ThemedStyle<TextStyle> = ({ colors }) => ({
   fontSize: 14,
   color: colors.text,
   padding: 0,
   minWidth: 30,
-}
+})
 
 const $tagInputRow: ViewStyle = {
   flexDirection: "row",
   gap: 8,
 }
 
-const $tagInput: TextStyle = {
+const $tagInput: ThemedStyle<TextStyle> = ({ colors }) => ({
   flex: 1,
   padding: 12,
   borderRadius: 8,
@@ -415,28 +415,28 @@ const $tagInput: TextStyle = {
   backgroundColor: colors.backgroundCard,
   borderWidth: 1,
   borderColor: colors.border,
-}
+})
 
-const $hint: TextStyle = {
+const $hint: ThemedStyle<TextStyle> = ({ colors }) => ({
   fontSize: 12,
-  opacity: 0.5,
+  color: colors.textDim,
   marginTop: 4,
-}
+})
 
-const $addButton: ViewStyle = {
+const $addButton: ThemedStyle<ViewStyle> = ({ colors }) => ({
   paddingHorizontal: 16,
   paddingVertical: 12,
   borderRadius: 8,
   backgroundColor: colors.tint,
-}
+})
 
-const $addButtonText: TextStyle = {
+const $addButtonText: ThemedStyle<TextStyle> = ({ colors }) => ({
   fontSize: 14,
   color: colors.textInverse,
   fontWeight: "600",
-}
+})
 
-const $propertyRow: ViewStyle = {
+const $propertyRow: ThemedStyle<ViewStyle> = ({ colors }) => ({
   flexDirection: "row",
   justifyContent: "space-between",
   alignItems: "center",
@@ -444,16 +444,16 @@ const $propertyRow: ViewStyle = {
   borderRadius: 8,
   backgroundColor: colors.backgroundCard,
   marginBottom: 8,
-}
+})
 
 const $propertyText: TextStyle = {
   fontSize: 16,
 }
 
-const $removeText: TextStyle = {
+const $removeText: ThemedStyle<TextStyle> = ({ colors }) => ({
   fontSize: 16,
-  color: "error",
-}
+  color: colors.error,
+})
 
 const $propertyInputRow: ViewStyle = {
   flexDirection: "row",
