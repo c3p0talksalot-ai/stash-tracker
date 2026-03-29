@@ -9,13 +9,18 @@ import type { AppStackScreenProps } from "@/navigators/navigationTypes"
 import { useAppTheme } from "@/theme/context"
 import { $styles } from "@/theme/styles"
 import type { ThemedStyle } from "@/theme/types"
+import type { ThemeContextModeT } from "@/theme/types"
 import { useHeader } from "@/utils/useHeader"
 
 interface SettingsScreenProps extends AppStackScreenProps<"Settings"> {}
 
 export const SettingsScreen: FC<SettingsScreenProps> = ({ navigation }) => {
-  const { themed, theme } = useAppTheme()
+  const { themed, theme, themeContext, setThemeContextOverride } = useAppTheme()
   const { handedness, setHandedness } = useSettings()
+
+  const handleThemeChange = (newTheme: ThemeContextModeT) => {
+    setThemeContextOverride(newTheme)
+  }
 
   useHeader(
     {
@@ -60,6 +65,38 @@ export const SettingsScreen: FC<SettingsScreenProps> = ({ navigation }) => {
           Preview (current): {handedness}-handed layout
         </Text>
       </View>
+
+      {/* Theme Section */}
+      <View style={themed($section)}>
+        <Text preset="heading" style={themed($sectionTitle)}>Theme</Text>
+        <Text preset="subheading" style={themed($sectionDesc)}>
+          Choose your preferred color scheme
+        </Text>
+
+        <View style={themed($themeRow)}>
+          <PressableIcon
+            icon="caretLeft"
+            color={themeContext === "light" ? theme.colors.tint : theme.colors.text}
+            size={28}
+            containerStyle={themed($handednessOption)}
+            onPress={() => handleThemeChange("light")}
+          />
+          <Text preset="heading" style={themed($handednessLabel)}>
+            {themeContext === "light" ? "☀️ Light" : "🌙 Dark"}
+          </Text>
+          <PressableIcon
+            icon="caretRight"
+            color={themeContext === "dark" ? theme.colors.tint : theme.colors.text}
+            size={28}
+            containerStyle={themed($handednessOption)}
+            onPress={() => handleThemeChange("dark")}
+          />
+        </View>
+
+        <Text size="sm" style={themed($previewLabel)}>
+          Current: {themeContext} mode
+        </Text>
+      </View>
     </Screen>
   )
 }
@@ -99,4 +136,11 @@ const $previewLabel: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
   marginTop: spacing.lg,
   color: colors.text,
   opacity: 0.5,
+})
+
+const $themeRow: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: spacing.xl,
 })
