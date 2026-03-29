@@ -120,7 +120,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
         <TouchableOpacity onPress={onCancel} style={themed($cancelButton)}>
           <Text style={themed($cancelText)}>Cancel</Text>
         </TouchableOpacity>
-        <Text style={themed($headerTitle)}>{item ? "Edit Item" : "New Item"}</Text>
+        <Text style={themed($headerTitle)}>{isEditing ? "Edit Item" : "New Item"}</Text>
         <TouchableOpacity onPress={handleSave} style={themed($saveButton)}>
           <Text style={themed($saveText)}>Save</Text>
         </TouchableOpacity>
