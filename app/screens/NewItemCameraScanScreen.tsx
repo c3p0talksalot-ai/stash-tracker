@@ -40,7 +40,7 @@ export function NewItemCameraScanScreen({ navigation }: Props) {
     if (!cameraRef.current || !isCameraReady) return
     
     try {
-      const photo = await cameraRef.current.takePicture({
+      const photo = await cameraRef.current.takePictureAsync({
         quality: 0.8,
         skipProcessing: false,
       })
