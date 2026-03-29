@@ -124,68 +124,64 @@ export function NewItemCameraScanScreen({ navigation }: Props) {
         onMountError={(error) => {
           console.error("Camera mount error:", error)
         }}
-      >
-        <View style={themed($overlay)}>
-          {/* Top controls */}
-          <View style={themed($topControls)}>
-            <TouchableOpacity
-              style={[themed($controlButton), { opacity: flash === "off" ? 0.5 : 1 }]}
-              onPress={cycleFlash}
-            >
-              <Text style={themed($controlIcon)}>{getFlashIcon()}</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity
-              style={[themed($controlButton), { opacity: isCameraReady ? 1 : 0.3 }]}
-              onPress={() => navigation.goBack()}
-            >
-              <Text style={themed($controlIcon)}>✕</Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Zoom controls */}
-          <View style={themed($zoomControls)}>
-            <TouchableOpacity
-              style={[themed($controlButton), { opacity: zoom > 0 ? 1 : 0.3 }]}
-              onPress={handleZoomOut}
-            >
-              <Text style={themed($controlIcon)}>−</Text>
-            </TouchableOpacity>
-            <Text style={themed($zoomLabel)}>{Math.round(zoom * 100)}%</Text>
-            <TouchableOpacity
-              style={[themed($controlButton), { opacity: zoom < 3 ? 1 : 0.3 }]}
-              onPress={handleZoomIn}
-            >
-              <Text style={themed($controlIcon)}>+</Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Bottom controls */}
-          <View style={themed($bottomControls)}>
-            <TouchableOpacity style={themed($galleryButton)} onPress={handleOpenGallery}>
-              <Text style={themed($galleryIcon)}>🖼</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity
-              style={themed($captureButton)}
-              onPress={handleCapture}
-              disabled={!isCameraReady}
-            >
-              <View style={themed($captureButtonInner)} />
-            </TouchableOpacity>
-            
-            <TouchableOpacity style={themed($flipButton)} onPress={toggleFacing}>
-              <Text style={themed($flipIcon)}>🔄</Text>
-            </TouchableOpacity>
-          </View>
+        onInitialized={() => setIsCameraReady(true)}
+      />
+      
+      {/* Overlay controls - absolutely positioned on top */}
+      <View style={themed($overlay)}>
+        {/* Top controls */}
+        <View style={themed($topControls)}>
+          <TouchableOpacity
+            style={[themed($controlButton), { opacity: flash === "off" ? 0.5 : 1 }]}
+            onPress={cycleFlash}
+          >
+            <Text style={themed($controlIcon)}>{getFlashIcon()}</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={[themed($controlButton), { opacity: isCameraReady ? 1 : 0.3 }]}
+            onPress={() => navigation.goBack()}
+          >
+            <Text style={themed($controlIcon)}>✕</Text>
+          </TouchableOpacity>
         </View>
-        
-        <CameraView
-          style={StyleSheet.absoluteFill}
-          facing={facing}
-          zoom={zoom}
-        />
-      </CameraView>
+
+        {/* Zoom controls */}
+        <View style={themed($zoomControls)}>
+          <TouchableOpacity
+            style={[themed($controlButton), { opacity: zoom > 0 ? 1 : 0.3 }]}
+            onPress={handleZoomOut}
+          >
+            <Text style={themed($controlIcon)}>−</Text>
+          </TouchableOpacity>
+          <Text style={themed($zoomLabel)}>{Math.round(zoom * 100)}%</Text>
+          <TouchableOpacity
+            style={[themed($controlButton), { opacity: zoom < 3 ? 1 : 0.3 }]}
+            onPress={handleZoomIn}
+          >
+            <Text style={themed($controlIcon)}>+</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Bottom controls */}
+        <View style={themed($bottomControls)}>
+          <TouchableOpacity style={themed($galleryButton)} onPress={handleOpenGallery}>
+            <Text style={themed($galleryIcon)}>🖼</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={themed($captureButton)}
+            onPress={handleCapture}
+            disabled={!isCameraReady}
+          >
+            <View style={themed($captureButtonInner)} />
+          </TouchableOpacity>
+          
+          <TouchableOpacity style={themed($flipButton)} onPress={toggleFacing}>
+            <Text style={themed($flipIcon)}>🔄</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </View>
   )
 }
