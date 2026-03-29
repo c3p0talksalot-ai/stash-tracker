@@ -203,7 +203,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
     try {
       if (isEditing && itemId) {
         await updateItem(itemId, {
-          name: name.trim(),
+          name: name,
           description: description.trim(),
           location: location.trim(),
           tags,
@@ -211,7 +211,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
         })
       } else {
         await createItem({
-          name: name.trim(),
+          name: name,
           description: description.trim(),
           location: location.trim(),
           tags,
