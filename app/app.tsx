@@ -31,7 +31,7 @@ import { ThemeProvider } from "./theme/context"
 import { customFontsToLoad } from "./theme/typography"
 import { loadDateFnsLocale } from "./utils/formatDate"
 import * as storage from "./utils/storage"
-import { seedTags } from "./database/seed"
+import { seedTags, seedItems } from "./database/seed"
 
 export const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE"
 
@@ -65,6 +65,7 @@ export function App() {
       .then(() => setIsI18nInitialized(true))
       .then(() => loadDateFnsLocale())
       .then(() => seedTags('inventory-tracking'))
+      .then(() => seedItems('inventory-tracking'))
   }, [])
 
   // Before we show the app, we have to wait for our state to be ready.
