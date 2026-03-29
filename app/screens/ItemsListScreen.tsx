@@ -200,6 +200,30 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
       <View style={themed($contentArea)}>
         <View style={themed($header)}>
           <Text preset="heading">My Items</Text>
+          {isSearchActive ? (
+            <TextInput
+              ref={searchInputRef}
+              style={themed($headerSearchInput)}
+              placeholder="Search..."
+              placeholderTextColor={colors.text}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              onSubmitEditing={() => {
+                // Search triggered - filter items
+                console.log("Search:", searchQuery)
+              }}
+              returnKeyType="search"
+              autoFocus
+            />
+          ) : (
+            <PressableIcon
+              icon="view"
+              color={theme.colors.text}
+              size={24}
+              containerStyle={themed($searchIcon)}
+              onPress={handleSearchToggle}
+            />
+          )}
         </View>
 
         <FlatList
