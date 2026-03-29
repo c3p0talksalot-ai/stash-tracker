@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react"
+import { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import {
   StyleSheet,
   View,
@@ -15,7 +15,7 @@ import {
 import { useNavigation } from "@react-navigation/native"
 import { useAppTheme } from "@/theme/context"
 import { useSettings } from "@/context/SettingsContext"
-import { getItem, createItem, updateItem, deleteItem } from "@/services/items"
+import { getItem, createItem, updateItem, deleteItem, getLocationSuggestions, getPropertyKeySuggestions, getPropertyUnitSuggestions, getTagSuggestions, getAllItems, type AutocompleteOption } from "@/services/items"
 import { Icon } from "@/components/Icon"
 import type { AppStackScreenProps } from "@/navigators/navigationTypes"
 import type { ThemedStyle } from "@/theme/types"
@@ -52,6 +52,47 @@ export function ItemEditorScreen({ navigation, route }: Props) {
   
   const isInitialLoad = useRef(true)
   const originalItemData = useRef<string>("")
+
+  // Autocomplete suggestions
+  const [locationSuggestions, setLocationSuggestions] = useState<AutocompleteOption[]>([])
+  const [propertyKeySuggestions, setPropertyKeySuggestions] = useState<AutocompleteOption[]>([])
+  const [propertyUnitSuggestions, setPropertyUnitSuggestions] = useState<AutocompleteOption[]>([])
+  const [tagSuggestions, setTagSuggestions] = useState<AutocompleteOption[]>([])
+  const [itemNameSuggestions, setItemNameSuggestions] = useState<AutocompleteOption[]>([])
+
+  // Load autocomplete suggestions on mount
+  useEffect(() => {
+    const loadSuggestions = async () => {
+      try {
+        const [locs, keys, units, tags, items] = await Promise.all([
+          getLocationSuggestions(),
+          getPropertyKeySuggestions(),
+          getPropertyUnitSuggestions(),
+          getTagSuggestions(),
+          getAllItems(),
+        ])
+        setLocationSuggestions(locs)
+        setPropertyKeySuggestions(keys)
+        setPropertyUnitSuggestions(units)
+        setTagSuggestions(tags)
+        // Extract unique item names for autocomplete
+        const nameSet = new Set<string>()
+        items.forEach((item) => {
+          if (item.name && item.name.trim()) {
+            nameSet.add(item.name.trim())
+          }
+        })
+        setItemNameSuggestions(
+          Array.from(nameSet)
+            .sort()
+            .map((name, index) => ({ id: `name-${index}`, label: name }))
+        )
+      } catch (e) {
+        console.error("Failed to load autocomplete suggestions:", e)
+      }
+    }
+    loadSuggestions()
+  }, [])
 
   // Generate hash of current data for change detection
   const getCurrentDataHash = useCallback(() => {

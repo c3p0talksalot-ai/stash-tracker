@@ -218,3 +218,83 @@ export async function getItemsByTag(tagId: string): Promise<ItemOutput[]> {
     .fetch()
   return Promise.all(items.map(itemToOutput))
 }
+
+// Autocomplete data functions
+
+export interface AutocompleteOption {
+  id: string
+  label: string
+}
+
+export async function getLocationSuggestions(): Promise<AutocompleteOption[]> {
+  const itemsCollection = database.get<Item>("items")
+  const items = await itemsCollection.query().fetch()
+  
+  // Extract unique locations
+  const locationSet = new Set<string>()
+  items.forEach((item) => {
+    if (item.location && item.location.trim()) {
+      locationSet.add(item.location.trim())
+    }
+  })
+  
+  // Convert to autocomplete options with deterministic IDs
+  return Array.from(locationSet)
+    .sort()
+    .map((location, index) => ({
+      id: `location-${index}`,
+      label: location,
+    }))
+}
+
+export async function getPropertyKeySuggestions(): Promise<AutocompleteOption[]> {
+  const propsCollection = database.get<Property>("properties")
+  const props = await propsCollection.query().fetch()
+  
+  // Extract unique keys
+  const keySet = new Set<string>()
+  props.forEach((prop) => {
+    if (prop.key && prop.key.trim()) {
+      keySet.add(prop.key.trim())
+    }
+  })
+  
+  return Array.from(keySet)
+    .sort()
+    .map((key, index) => ({
+      id: `key-${index}`,
+      label: key,
+    }))
+}
+
+export async function getPropertyUnitSuggestions(): Promise<AutocompleteOption[]> {
+  const propsCollection = database.get<Property>("properties")
+  const props = await propsCollection.query().fetch()
+  
+  // Extract unique units
+  const unitSet = new Set<string>()
+  props.forEach((prop) => {
+    if (prop.unit && prop.unit.trim()) {
+      unitSet.add(prop.unit.trim())
+    }
+  })
+  
+  return Array.from(unitSet)
+    .sort()
+    .map((unit, index) => ({
+      id: `unit-${index}`,
+      label: unit,
+    }))
+}
+
+export async function getTagSuggestions(): Promise<AutocompleteOption[]> {
+  const tagsCollection = database.get<Tag>("tags")
+  const tags = await tagsCollection.query().fetch()
+  
+  return tags
+    .map((tag) => ({
+      id: tag.id,
+      label: tag.name,
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label))
+}
