@@ -149,14 +149,40 @@ export function ItemEditorScreen({ navigation, route }: Props) {
   return (
     <ScrollView style={[themed($container), styles.container]}>
       <View style={themed($header)}>
-        <TouchableOpacity onPress={onCancel} style={themed($cancelButton)}>
-          <Text style={themed($cancelText)}>Cancel</Text>
+        <TouchableOpacity onPress={onCancel} style={themed($iconButton)}>
+          <Icon icon="back" size={24} color={themedStyles.backIcon.color} />
         </TouchableOpacity>
         <Text style={themed($headerTitle)}>{isEditing ? "Edit Item" : "New Item"}</Text>
-        <TouchableOpacity onPress={handleSave} style={themed($saveButton)}>
-          <Text style={themed($saveText)}>Save</Text>
-        </TouchableOpacity>
+        {isEditing ? (
+          <TouchableOpacity ref={menuButtonRef} onPress={toggleMenu} style={themed($iconButton)}>
+            <Icon icon="more" size={24} color={themedStyles.backIcon.color} />
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity onPress={handleSave} style={themed($iconButton)}>
+            <Icon icon="check" size={24} color={themedStyles.saveIcon.color} />
+          </TouchableOpacity>
+        )}
       </View>
+
+      <Modal visible={menuVisible} transparent animationType="fade" onRequestClose={() => setMenuVisible(false)}>
+        <Pressable style={themed($modalOverlay)} onPress={() => setMenuVisible(false)}>
+          <View style={themed($menuContainer)}>
+            <TouchableOpacity style={themed($menuItem)} onPress={onCancel}>
+              <Icon icon="back" size={20} color={themedStyles.menuIcon.color} />
+              <Text style={themed($menuItemText)}></Text>
+            </TouchableOpacity>
+            <View style={themed($menuDivider)} />
+            <TouchableOpacity style={themed($menuItem)} onPress={handleEdit}>
+              <Icon icon="settings" size={20} color={themedStyles.menuIcon.color} />
+              <Text style={themed($menuItemText)}></Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={themed($menuItem)} onPress={handleDelete}>
+              <Icon icon="bell" size={20} color={themedStyles.deleteIcon.color} />
+              <Text style={[themed($menuItemText), { color: themedStyles.deleteIcon.color }]}></Text>
+            </TouchableOpacity>
+          </View>
+        </Pressable>
+      </Modal>
 
       <View style={themed($content)}>
         <View style={themed($field)}>
