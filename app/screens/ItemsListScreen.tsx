@@ -1,7 +1,7 @@
-import { FC, useState } from "react"
-import { FlatList, TextStyle, View, ViewStyle } from "react-native"
+import { FC, useState, useRef } from "react"
+import { FlatList, TextInput, TextStyle, View, ViewStyle } from "react-native"
 
-import { PressableIcon, type IconTypes } from "@/components/Icon"
+import { PressableIcon } from "@/components/Icon"
 import { Screen } from "@/components/Screen"
 import { Text } from "@/components/Text"
 import { useSettings } from "@/context/SettingsContext"
@@ -30,14 +30,22 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
   const { themed, theme } = useAppTheme()
   const { handedness } = useSettings()
   const [items] = useState<ItemData[]>(MOCK_ITEMS)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [isSearchActive, setIsSearchActive] = useState(false)
+  const searchInputRef = useRef<TextInput>(null)
 
   const $containerInsets = useSafeAreaInsetsStyle(["bottom"])
 
   const isLeftHanded = handedness === "left"
 
-  const handleSearch = () => {
-    // TODO: Implement search - ticket #34
-    console.log("Search pressed")
+  const handleSearchToggle = () => {
+    if (!isSearchActive) {
+      setIsSearchActive(true)
+      setTimeout(() => searchInputRef.current?.focus(), 100)
+    } else {
+      setSearchQuery("")
+      setIsSearchActive(false)
+    }
   }
 
   const handleAddNew = () => {
@@ -60,61 +68,90 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
     </View>
   )
 
-  // Left-handed: [+] [settings] | [search]
-  // Right-handed: [search] | [settings] [+]
-  const leftIcons = isLeftHanded ? (
-    <>
-      <PressableIcon
-        icon="more"
-        color={theme.colors.tint}
-        size={32}
-        containerStyle={themed($navIconAdd)}
-        onPress={handleAddNew}
+  const renderSearchInput = () => (
+    <View style={themed($searchInputContainer)}>
+      <TextInput
+        ref={searchInputRef}
+        style={themed($searchInput)}
+        placeholder="Search..."
+        placeholderTextColor={theme.colors.text}
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+        onBlur={() => !searchQuery && setIsSearchActive(false)}
+        autoFocus
       />
-      <PressableIcon
-        icon="settings"
-        color={theme.colors.text}
-        size={28}
-        containerStyle={themed($navIcon)}
-        onPress={handleSettings}
-      />
-    </>
-  ) : (
-    <PressableIcon
-      icon="view"
-      color={theme.colors.text}
-      size={28}
-      containerStyle={themed($navIcon)}
-      onPress={handleSearch}
-    />
+    </View>
   )
 
-  const rightIcons = isLeftHanded ? (
-    <PressableIcon
-      icon="view"
-      color={theme.colors.text}
-      size={28}
-      containerStyle={themed($navIcon)}
-      onPress={handleSearch}
-    />
-  ) : (
-    <>
+  const renderLeftIcons = () => {
+    if (isLeftHanded) {
+      return (
+        <View style={themed($navSideInner)}>
+          <PressableIcon
+            icon="more"
+            color={theme.colors.tint}
+            size={32}
+            containerStyle={themed($navIconAdd)}
+            onPress={handleAddNew}
+          />
+          <PressableIcon
+            icon="settings"
+            color={theme.colors.text}
+            size={28}
+            containerStyle={themed($navIcon)}
+            onPress={handleSettings}
+          />
+        </View>
+      )
+    }
+    if (isSearchActive) {
+      return renderSearchInput()
+    }
+    return (
       <PressableIcon
-        icon="settings"
+        icon="view"
         color={theme.colors.text}
         size={28}
         containerStyle={themed($navIcon)}
-        onPress={handleSettings}
+        onPress={handleSearchToggle}
       />
-      <PressableIcon
-        icon="more"
-        color={theme.colors.tint}
-        size={32}
-        containerStyle={themed($navIconAdd)}
-        onPress={handleAddNew}
-      />
-    </>
-  )
+    )
+  }
+
+  const renderRightIcons = () => {
+    if (isLeftHanded) {
+      if (isSearchActive) {
+        return renderSearchInput()
+      }
+      return (
+        <PressableIcon
+          icon="view"
+          color={theme.colors.text}
+          size={28}
+          containerStyle={themed($navIcon)}
+          onPress={handleSearchToggle}
+        />
+      )
+    }
+    return (
+      <View style={themed($navSideInner)}>
+        <PressableIcon
+          icon="settings"
+          color={theme.colors.text}
+          size={28}
+          containerStyle={themed($navIcon)}
+          onPress={handleSettings}
+        />
+        <PressableIcon
+          icon="more"
+          color={theme.colors.tint}
+          size={32}
+          containerStyle={themed($navIconAdd)}
+          onPress={handleAddNew}
+        />
+      </View>
+    )
+  }
 
   return (
     <Screen preset="fixed" contentContainerStyle={[$styles.flex1, $containerInsets]}>
@@ -139,10 +176,10 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
         }
       />
 
-      {/* Bottom Navigation Bar - flipped by handedness */}
+      {/* Bottom Navigation Bar */}
       <View style={themed($bottomNav)}>
-        <View style={themed($navSide)}>{leftIcons}</View>
-        <View style={themed($navSide)}>{rightIcons}</View>
+        {renderLeftIcons()}
+        {renderRightIcons()}
       </View>
     </Screen>
   )
@@ -176,6 +213,20 @@ const $emptyState: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   alignItems: "center",
 })
 
+const $searchInputContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  flex: 1,
+  maxWidth: 180,
+})
+
+const $searchInput: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
+  backgroundColor: colors.palette.neutral200,
+  borderRadius: 8,
+  paddingHorizontal: spacing.md,
+  paddingVertical: spacing.sm,
+  color: colors.text,
+  fontSize: 16,
+})
+
 const $bottomNav: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   position: "absolute",
   bottom: 0,
@@ -187,6 +238,12 @@ const $bottomNav: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   paddingHorizontal: spacing.xl,
   paddingBottom: spacing.lg,
   backgroundColor: colors.background,
+})
+
+const $navSideInner: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  flexDirection: "row",
+  alignItems: "center",
+  gap: spacing.md,
 })
 
 const $navSide: ThemedStyle<ViewStyle> = ({ spacing }) => ({
