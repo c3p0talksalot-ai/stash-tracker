@@ -139,7 +139,7 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
             style={themed($addButton)}
             onPress={handleAddNew}
           >
-            <Text style={{ color: theme.colors.tint, fontSize: 26, fontWeight: "300", lineHeight: 28 }}>+</Text>
+            <Text style={{ color: theme.colors.textInverse, fontSize: 26, fontWeight: "300", lineHeight: 28 }}>+</Text>
           </TouchableOpacity>
           <PressableIcon
             icon="settings"
@@ -187,7 +187,7 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
           style={themed($addButton)}
           onPress={handleAddNew}
         >
-          <Text style={{ color: theme.colors.tint, fontSize: 26, fontWeight: "300", lineHeight: 28 }}>+</Text>
+          <Text style={{ color: theme.colors.textInverse, fontSize: 26, fontWeight: "300", lineHeight: 28 }}>+</Text>
         </TouchableOpacity>
       </View>
     )
