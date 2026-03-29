@@ -331,7 +331,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
           <TextInput
             style={themed($input)}
             value={name}
-            onChangeText={setName}
+            onChangeText={(text) => { console.log("!!! TYPING name:", text); setName(text) }}
             placeholder="Enter item name"
             placeholderTextColor={colors.textDim}
             onBlur={handleBlur}
@@ -343,7 +343,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
           <TextInput
             style={themed($input)}
             value={location}
-            onChangeText={setLocation}
+            onChangeText={(text) => { console.log("!!! TYPING location:", text); setLocation(text) }}
             placeholder="e.g., Garage, Closet"
             placeholderTextColor={colors.textDim}
             onBlur={handleBlur}
@@ -355,7 +355,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
           <TextInput
             style={[themed($input), { minHeight: 80, textAlignVertical: "top" }]}
             value={description}
-            onChangeText={setDescription}
+            onChangeText={(text) => { console.log("!!! TYPING description:", text); setDescription(text) }}
             placeholder="Enter description"
             placeholderTextColor={colors.textDim}
             multiline
