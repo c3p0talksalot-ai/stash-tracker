@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import {
   StyleSheet,
   View,
@@ -17,6 +17,8 @@ import { getItem, createItem, updateItem, deleteItem } from "@/services/items"
 import { Icon } from "@/components/Icon"
 import type { AppStackScreenProps } from "@/navigators/navigationTypes"
 import type { ThemedStyle } from "@/theme/types"
+import { useSettings } from "@/context/SettingsContext"
+import { useFocusEffect } from "@react-navigation/native"
 
 type Props = AppStackScreenProps<"ItemEditor">
 
@@ -24,6 +26,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
   const { itemId } = route.params || {}
   const { themed, theme } = useAppTheme()
   const { colors } = theme
+  const { autosave } = useSettings()
   const isEditing = !!itemId
 
   const [name, setName] = useState("")
@@ -37,6 +40,8 @@ export function ItemEditorScreen({ navigation, route }: Props) {
   const [newPropUnit, setNewPropUnit] = useState("")
   const [loading, setLoading] = useState(isEditing)
   const [menuVisible, setMenuVisible] = useState(false)
+  const [hasChanges, setHasChanges] = useState(false)
+  const initialDataRef = useRef<{ name: string; description: string; location: string; tags: string[]; properties: { key: string; value: string; unit?: string }[] }>({ name: "", description: "", location: "", tags: [], properties: [] })
 
   useEffect(() => {
     if (itemId) {
@@ -53,6 +58,14 @@ export function ItemEditorScreen({ navigation, route }: Props) {
         setLocation(item.location || "")
         setTags(item.tags)
         setProperties(item.properties)
+        // Store initial data for change detection
+        initialDataRef.current = {
+          name: item.name,
+          description: item.description || "",
+          location: item.location || "",
+          tags: item.tags,
+          properties: item.properties,
+        }
       }
     } catch (e) {
       console.error("Failed to load item:", e)
@@ -61,7 +74,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
     }
   }
 
-  // Track changes and autosave
+  // Track changes and autosave for editing existing items
   useEffect(() => {
     if (!isEditing) return undefined
     
@@ -120,7 +133,80 @@ export function ItemEditorScreen({ navigation, route }: Props) {
 
   const availableTags = ["hardware", "plumbing", "electronics", "tools", "lighting", "outdoor", "kitchen", "automotive"]
 
-  const onCancel = () => navigation.goBack()
+  // Warn before navigating away with unsaved changes
+  useFocusEffect(
+    useCallback(() => {
+      const unsubscribe = navigation.addListener("beforeRemove", (e) => {
+        // Skip if autosave is on (changes already saved) or no changes
+        if (autosave || !hasChanges) return
+
+        // Prevent default navigation
+        e.preventDefault()
+
+        // Show confirmation dialog
+        Alert.alert(
+          "Unsaved Changes",
+          "You have unsaved changes. Do you want to save before leaving?",
+          [
+            {
+              text: "Save & Exit",
+              onPress: async () => {
+                if (isEditing && itemId) {
+                  await updateItem(itemId, {
+                    name: name.trim(),
+                    description: description.trim(),
+                    location: location.trim(),
+                    tags,
+                    properties,
+                  })
+                }
+                navigation.dispatch(e.data.action)
+              },
+            },
+            {
+              text: "Discard & Exit",
+              style: "destructive",
+              onPress: () => navigation.dispatch(e.data.action),
+            },
+            {
+              text: "Stay",
+              style: "cancel",
+            },
+          ],
+        )
+      })
+
+      return unsubscribe
+    }, [navigation, autosave, hasChanges, isEditing, itemId, name, description, location, tags, properties]),
+  )
+
+  const onCancel = () => {
+    if (!autosave && hasChanges) {
+      Alert.alert(
+        "Unsaved Changes",
+        "You have unsaved changes. Do you want to save before leaving?",
+        [
+          {
+            text: "Save & Exit",
+            onPress: async () => {
+              await handleSave()
+            },
+          },
+          {
+            text: "Discard & Exit",
+            style: "destructive",
+            onPress: () => navigation.goBack(),
+          },
+          {
+            text: "Stay",
+            style: "cancel",
+          },
+        ],
+      )
+    } else {
+      navigation.goBack()
+    }
+  }
 
   const addTag = (tag: string) => {
     if (tag && !tags.includes(tag)) {
@@ -218,9 +304,15 @@ export function ItemEditorScreen({ navigation, route }: Props) {
         </TouchableOpacity>
         <Text style={themed($headerTitle)}>{isEditing ? "Edit Item" : "New Item"}</Text>
         {isEditing ? (
-          <TouchableOpacity onPress={toggleMenu} style={themed($iconButton)}>
-            <Icon icon="more" size={24} />
-          </TouchableOpacity>
+          !autosave && hasChanges ? (
+            <TouchableOpacity onPress={handleSave} style={themed($iconButton)}>
+              <Icon icon="check" size={24} color={theme.colors.tint} />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity onPress={toggleMenu} style={themed($iconButton)}>
+              <Icon icon="more" size={24} />
+            </TouchableOpacity>
+          )
         ) : (
           <TouchableOpacity onPress={handleSave} style={themed($iconButton)}>
             <Icon icon="check" size={24} />
@@ -412,13 +504,8 @@ const $input: ThemedStyle<TextStyle> = ({ colors }) => ({
   borderRadius: 8,
   fontSize: 16,
   backgroundColor: colors.backgroundCard,
-  color: colors.text,
   borderWidth: 1,
-  backgroundColor: colors.backgroundCard,
-  color: colors.text,
   borderColor: colors.border,
-})
-})
   color: colors.text,
 })
 
@@ -440,9 +527,9 @@ const $tagChip: ViewStyle = {
   gap: 4,
 }
 
-const $tagChipText: ThemedStyle<TextStyle> = ({ colors }) => ({
+const $tagChipText: TextStyle = {
   fontSize: 14,
-  color: colors.textInverse,,
+  color: "white",
 }
 
 const $tagInputContainer: ViewStyle = {
@@ -450,11 +537,7 @@ const $tagInputContainer: ViewStyle = {
   paddingVertical: 6,
   borderRadius: 16,
   borderWidth: 1,
-  backgroundColor: colors.backgroundCard,
-  color: colors.text,
-  borderColor: colors.border,
-})
-})
+  borderColor: "border",
   borderStyle: "dashed",
   minWidth: 40,
   alignItems: "center",
@@ -473,21 +556,27 @@ const $tagInputRow: ViewStyle = {
   gap: 8,
 }
 
-const $tagInput: ThemedStyle<TextStyle> = ({ colors }) => ({
+const $tagInput: TextStyle = {
   flex: 1,
   padding: 12,
   borderRadius: 8,
   fontSize: 16,
-  backgroundColor: colors.backgroundCard,
+<<<<<<< Updated upstream
   color: colors.text,
   borderColor: colors.border,
 })
+=======
+  backgroundColor: "card",
+  borderWidth: 1,
+  borderColor: "border",
+>>>>>>> Stashed changes
 }
 
 const $hint: ThemedStyle<TextStyle> = ({ colors }) => ({
   fontSize: 12,
   color: colors.textDim,
   marginTop: 4,
+})
 }
 
 const $addButton: ViewStyle = {
@@ -499,7 +588,7 @@ const $addButton: ViewStyle = {
 
 const $addButtonText: TextStyle = {
   fontSize: 14,
-  color: colors.textInverse,,
+  color: "white",
   fontWeight: "600",
 }
 
@@ -509,8 +598,7 @@ const $propertyRow: ViewStyle = {
   alignItems: "center",
   padding: 12,
   borderRadius: 8,
-  backgroundColor: colors.backgroundCard,
-  color: colors.text,
+  backgroundColor: "card",
   marginBottom: 8,
 }
 
@@ -542,7 +630,6 @@ const $modalOverlay: ThemedStyle<ViewStyle> = () => ({
 
 const $menuContainer: ThemedStyle<ViewStyle> = ({ colors }) => ({
   backgroundColor: colors.backgroundCard,
-  color: colors.text,
   borderRadius: 12,
   paddingVertical: 8,
   paddingHorizontal: 16,
