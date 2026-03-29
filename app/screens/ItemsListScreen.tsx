@@ -86,6 +86,7 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
   }
 
   const handleAddNew = () => {
+    console.log("Add new pressed, navigating to NewItemCameraScan")
     // Navigate to camera flow - NewItemCameraScan screen
     navigation.navigate("NewItemCameraScan")
   }
@@ -353,12 +354,16 @@ const $navIcon: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   padding: spacing.sm,
 })
 
-const $addButton: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+const $addButton: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   padding: spacing.sm,
-  width: 40,
-  height: 40,
+  width: 44,
+  height: 44,
   alignItems: "center",
   justifyContent: "center",
+  backgroundColor: colors.card,
+  borderRadius: 22,
+  borderWidth: 2,
+  borderColor: colors.tint,
 })
 
 const $navIconAdd: ThemedStyle<ViewStyle> = ({ spacing }) => ({
