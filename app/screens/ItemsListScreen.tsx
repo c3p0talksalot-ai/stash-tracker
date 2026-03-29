@@ -151,9 +151,6 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
         </View>
       )
     }
-    if (isSearchActive) {
-      return renderSearchInput()
-    }
     return (
       <PressableIcon
         icon="view"
@@ -167,9 +164,6 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
 
   const renderRightIcons = () => {
     if (isLeftHanded) {
-      if (isSearchActive) {
-        return renderSearchInput()
-      }
       return (
         <PressableIcon
           icon="view"
