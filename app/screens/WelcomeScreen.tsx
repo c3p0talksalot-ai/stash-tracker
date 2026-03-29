@@ -53,7 +53,7 @@ export const WelcomeScreen: FC<WelcomeScreenProps> = function WelcomeScreen(_pro
           style={$welcomeFace}
           source={welcomeFace}
           resizeMode="contain"
-          tintColor={theme.colors.colors.text}
+          tintColor={theme.colors.text}
         />
       </View>
 
