@@ -37,6 +37,9 @@ export function NewItemCameraScanScreen({ navigation }: Props) {
   }, [])
 
   const handleCapture = async () => {
+    console.log("Capture pressed", { hasRef: !!cameraRef.current, isCameraReady })
+    Alert.alert("Debug", `hasRef: ${!!cameraRef.current}, ready: ${isCameraReady}`)
+    
     if (!cameraRef.current || !isCameraReady) return
     
     try {
