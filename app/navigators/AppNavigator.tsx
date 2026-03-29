@@ -11,7 +11,6 @@ import Config from "@/config"
 import { useAuth } from "@/context/AuthContext"
 import { ErrorBoundary } from "@/screens/ErrorScreen/ErrorBoundary"
 import { ItemsListScreen } from "@/screens/ItemsListScreen"
-import { ItemDetailScreen } from "@/screens/ItemDetailScreen"
 import { ItemEditorScreen } from "@/screens/ItemEditorScreen"
 import { LoginScreen } from "@/screens/LoginScreen"
 import { NewItemCameraScanScreen } from "@/screens/NewItemCameraScanScreen"
@@ -63,7 +62,6 @@ const AppStack = () => {
         <>
           <Stack.Screen name="Welcome" component={WelcomeScreen} />
           <Stack.Screen name="ItemsList" component={ItemsListScreen} />
-          <Stack.Screen name="ItemDetail" component={ItemDetailScreen} />
           <Stack.Screen name="ItemEditor" component={ItemEditorScreen} />
           <Stack.Screen name="Settings" component={SettingsScreen} />
           <Stack.Screen name="NewItemCameraScan" component={NewItemCameraScanScreen} />
