@@ -61,6 +61,63 @@ export function ItemEditorScreen({ navigation, route }: Props) {
     }
   }
 
+  // Track changes and autosave
+  useEffect(() => {
+    if (!isEditing) return undefined
+    
+    const currentData = { name, description, location, tags, properties }
+    const initial = initialDataRef.current
+    const changed = 
+      currentData.name !== initial.name ||
+      currentData.description !== initial.description ||
+      currentData.location !== initial.location ||
+      JSON.stringify(currentData.tags) !== JSON.stringify(initial.tags) ||
+      JSON.stringify(currentData.properties) !== JSON.stringify(initial.properties)
+    
+    setHasChanges(changed)
+
+    if (autosave && changed && itemId) {
+      // Debounced autosave
+      const timeoutId = setTimeout(() => {
+        updateItem(itemId, {
+          name: name.trim(),
+          description: description.trim(),
+          location: location.trim(),
+          tags,
+          properties,
+        })
+        initialDataRef.current = currentData
+        setHasChanges(false)
+      }, 500)
+      return () => clearTimeout(timeoutId)
+    }
+    return undefined
+  }, [name, description, location, tags, properties, autosave, itemId, isEditing])
+
+  // Track changes for new items
+  useEffect(() => {
+    if (isEditing) return undefined
+    
+    // For new items, any non-empty field counts as a change
+    const hasAnyData = Boolean(name || description || location || tags.length > 0 || properties.length > 0)
+    setHasChanges(hasAnyData)
+
+    if (autosave && hasAnyData && !isEditing) {
+      const timeoutId = setTimeout(() => {
+        createItem({
+          name: name.trim() || "Untitled",
+          description: description.trim(),
+          location: location.trim(),
+          tags,
+          properties,
+        })
+        setHasChanges(false)
+      }, 500)
+      return () => clearTimeout(timeoutId)
+    }
+    return undefined
+  }, [name, description, location, tags, properties, autosave, isEditing])
+
   const availableTags = ["hardware", "plumbing", "electronics", "tools", "lighting", "outdoor", "kitchen", "automotive"]
 
   const onCancel = () => navigation.goBack()
@@ -355,8 +412,13 @@ const $input: ThemedStyle<TextStyle> = ({ colors }) => ({
   borderRadius: 8,
   fontSize: 16,
   backgroundColor: colors.backgroundCard,
+  color: colors.text,
   borderWidth: 1,
+  backgroundColor: colors.backgroundCard,
+  color: colors.text,
   borderColor: colors.border,
+})
+})
   color: colors.text,
 })
 
@@ -378,9 +440,9 @@ const $tagChip: ViewStyle = {
   gap: 4,
 }
 
-const $tagChipText: TextStyle = {
+const $tagChipText: ThemedStyle<TextStyle> = ({ colors }) => ({
   fontSize: 14,
-  color: "white",
+  color: colors.textInverse,,
 }
 
 const $tagInputContainer: ViewStyle = {
@@ -388,7 +450,11 @@ const $tagInputContainer: ViewStyle = {
   paddingVertical: 6,
   borderRadius: 16,
   borderWidth: 1,
-  borderColor: "border",
+  backgroundColor: colors.backgroundCard,
+  color: colors.text,
+  borderColor: colors.border,
+})
+})
   borderStyle: "dashed",
   minWidth: 40,
   alignItems: "center",
@@ -407,19 +473,19 @@ const $tagInputRow: ViewStyle = {
   gap: 8,
 }
 
-const $tagInput: TextStyle = {
+const $tagInput: ThemedStyle<TextStyle> = ({ colors }) => ({
   flex: 1,
   padding: 12,
   borderRadius: 8,
   fontSize: 16,
-  backgroundColor: "card",
-  borderWidth: 1,
-  borderColor: "border",
+  color: colors.text,
+  borderColor: colors.border,
+})
 }
 
-const $hint: TextStyle = {
+const $hint: ThemedStyle<TextStyle> = ({ colors }) => ({
   fontSize: 12,
-  opacity: 0.5,
+  color: colors.textDim,
   marginTop: 4,
 }
 
@@ -432,7 +498,7 @@ const $addButton: ViewStyle = {
 
 const $addButtonText: TextStyle = {
   fontSize: 14,
-  color: "white",
+  color: colors.textInverse,,
   fontWeight: "600",
 }
 
@@ -442,7 +508,8 @@ const $propertyRow: ViewStyle = {
   alignItems: "center",
   padding: 12,
   borderRadius: 8,
-  backgroundColor: "card",
+  backgroundColor: colors.backgroundCard,
+  color: colors.text,
   marginBottom: 8,
 }
 
@@ -474,6 +541,7 @@ const $modalOverlay: ThemedStyle<ViewStyle> = () => ({
 
 const $menuContainer: ThemedStyle<ViewStyle> = ({ colors }) => ({
   backgroundColor: colors.backgroundCard,
+  color: colors.text,
   borderRadius: 12,
   paddingVertical: 8,
   paddingHorizontal: 16,

@@ -4,6 +4,7 @@ import { TextStyle, View, ViewStyle } from "react-native"
 import { PressableIcon } from "@/components/Icon"
 import { Screen } from "@/components/Screen"
 import { Text } from "@/components/Text"
+import { Switch } from "@/components/Toggle/Switch"
 import { useSettings, type Handedness } from "@/context/SettingsContext"
 import type { AppStackScreenProps } from "@/navigators/navigationTypes"
 import { useAppTheme } from "@/theme/context"
@@ -16,7 +17,7 @@ interface SettingsScreenProps extends AppStackScreenProps<"Settings"> {}
 
 export const SettingsScreen: FC<SettingsScreenProps> = ({ navigation }) => {
   const { themed, theme, themeContext, setThemeContextOverride } = useAppTheme()
-  const { handedness, setHandedness } = useSettings()
+  const { handedness, setHandedness, autosave, setAutosave } = useSettings()
 
   const handleThemeChange = (newTheme: ThemeContextModeT) => {
     setThemeContextOverride(newTheme)
@@ -97,6 +98,30 @@ export const SettingsScreen: FC<SettingsScreenProps> = ({ navigation }) => {
           Current: {themeContext} mode
         </Text>
       </View>
+
+      {/* Autosave Section */}
+      <View style={themed($section)}>
+        <Text preset="heading" style={themed($sectionTitle)}>Autosave</Text>
+        <Text preset="subheading" style={themed($sectionDesc)}>
+          Automatically save changes when editing items
+        </Text>
+
+        <View style={themed($autosaveRow)}>
+          <Text preset="subheading" style={themed($autosaveLabel)}>
+            {autosave ? "On" : "Off"}
+          </Text>
+          <Switch
+            value={autosave}
+            onValueChange={setAutosave}
+          />
+        </View>
+
+        <Text size="sm" style={themed($previewLabel)}>
+          {autosave 
+            ? "Changes save automatically as you edit" 
+            : "Changes require manual save (button appears)"}
+        </Text>
+      </View>
     </Screen>
   )
 }
@@ -143,4 +168,16 @@ const $themeRow: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   alignItems: "center",
   justifyContent: "center",
   gap: spacing.xl,
+})
+
+const $autosaveRow: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: spacing.xl,
+})
+
+const $autosaveLabel: ThemedStyle<TextStyle> = ({ spacing }) => ({
+  minWidth: 50,
+  textAlign: "center",
 })
