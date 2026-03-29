@@ -230,7 +230,7 @@ const EpisodeCard = ({
               <Icon
                 icon="heart"
                 size={ICON_SIZE}
-                color={colors.palette.neutral800} // dark grey
+                color={colors.text} // dark grey
               />
             </Animated.View>
             <Animated.View
@@ -239,7 +239,7 @@ const EpisodeCard = ({
               <Icon
                 icon="heart"
                 size={ICON_SIZE}
-                color={colors.palette.primary400} // pink
+                color={colors.tint} // pink
               />
             </Animated.View>
           </View>
@@ -322,7 +322,7 @@ const $item: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   padding: spacing.md,
   marginTop: spacing.md,
   minHeight: 120,
-  backgroundColor: colors.palette.neutral100,
+  backgroundColor: colors.backgroundCard,
 })
 
 const $itemThumbnail: ThemedStyle<ImageStyle> = ({ spacing }) => ({
@@ -360,8 +360,8 @@ const $favoriteButton: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   borderRadius: 17,
   marginTop: spacing.md,
   justifyContent: "flex-start",
-  backgroundColor: colors.palette.neutral300,
-  borderColor: colors.palette.neutral300,
+  backgroundColor: colors.border,
+  borderColor: colors.border,
   paddingHorizontal: spacing.md,
   paddingTop: spacing.xxxs,
   paddingBottom: 0,
@@ -370,8 +370,8 @@ const $favoriteButton: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
 })
 
 const $unFavoriteButton: ThemedStyle<ViewStyle> = ({ colors }) => ({
-  borderColor: colors.palette.primary100,
-  backgroundColor: colors.palette.primary100,
+  borderColor: colors.primaryBackground,
+  backgroundColor: colors.primaryBackground,
 })
 
 const $emptyState: ThemedStyle<ViewStyle> = ({ spacing }) => ({

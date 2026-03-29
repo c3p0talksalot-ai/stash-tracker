@@ -183,7 +183,7 @@ const $buttonContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
 })
 
 const $hint: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
-  color: colors.palette.neutral600,
+  color: colors.textDim,
   fontSize: 12,
   lineHeight: 15,
   paddingBottom: spacing.lg,

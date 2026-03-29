@@ -59,14 +59,14 @@ export const LoginScreen: FC<LoginScreenProps> = () => {
         return (
           <PressableIcon
             icon={isAuthPasswordHidden ? "view" : "hidden"}
-            color={colors.palette.neutral800}
+            color={colors.text}
             containerStyle={props.style}
             size={20}
             onPress={() => setIsAuthPasswordHidden(!isAuthPasswordHidden)}
           />
         )
       },
-    [isAuthPasswordHidden, colors.palette.neutral800],
+    [isAuthPasswordHidden, colors.text],
   )
 
   return (

@@ -95,4 +95,5 @@ export const colors = {
   // Aliases for components expecting these names
   card: palette.neutral100,
   primary: palette.primary500,
+  primaryBackground: palette.primary100,
 } as const

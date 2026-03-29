@@ -277,7 +277,7 @@ const $header: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
 const $headerSearchInput: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
   flex: 1,
   marginLeft: spacing.md,
-  backgroundColor: colors.palette.neutral200,
+  backgroundColor: colors.card,
   borderRadius: 8,
   paddingHorizontal: spacing.md,
   paddingVertical: spacing.sm,
@@ -294,7 +294,7 @@ const $listContent: ThemedStyle<ViewStyle> = ({ spacing }) => ({
 })
 
 const $itemCard: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
-  backgroundColor: colors.palette.neutral200,
+  backgroundColor: colors.card,
   padding: spacing.md,
   borderRadius: 8,
   marginBottom: spacing.sm,
@@ -316,7 +316,7 @@ const $searchInputContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
 })
 
 const $searchInput: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
-  backgroundColor: colors.palette.neutral200,
+  backgroundColor: colors.card,
   borderRadius: 8,
   paddingHorizontal: spacing.md,
   paddingVertical: spacing.sm,

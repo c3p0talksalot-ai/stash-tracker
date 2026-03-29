@@ -53,7 +53,7 @@ export const WelcomeScreen: FC<WelcomeScreenProps> = function WelcomeScreen(_pro
           style={$welcomeFace}
           source={welcomeFace}
           resizeMode="contain"
-          tintColor={theme.colors.palette.neutral900}
+          tintColor={theme.colors.colors.text}
         />
       </View>
 
@@ -83,7 +83,7 @@ const $bottomContainer: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   flexShrink: 1,
   flexGrow: 0,
   flexBasis: "43%",
-  backgroundColor: colors.palette.neutral100,
+  backgroundColor: colors.background,
   borderTopLeftRadius: 16,
   borderTopRightRadius: 16,
   paddingHorizontal: spacing.lg,
