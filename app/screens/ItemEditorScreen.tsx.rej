@@ -1,0 +1,10 @@
+--- app/screens/ItemEditorScreen.tsx
++++ app/screens/ItemEditorScreen.tsx
+@@ -202,6 +203,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
+     setIsSaving(true)
+     try {
+       if (isEditing && itemId) {
++        console.log("!!! UPDATE ITEM CALL, name:", name)
+         await updateItem(itemId, {
+           name: name,
+           description: description,
