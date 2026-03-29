@@ -22,7 +22,7 @@ type Props = AppStackScreenProps<"ItemEditor">
 
 export function ItemEditorScreen({ navigation, route }: Props) {
   const { itemId } = route.params || {}
-  const { themed } = useAppTheme()
+  const { themed, theme } = useAppTheme()
   const isEditing = !!itemId
 
   const [name, setName] = useState("")
@@ -36,17 +36,16 @@ export function ItemEditorScreen({ navigation, route }: Props) {
   const [newPropUnit, setNewPropUnit] = useState("")
   const [loading, setLoading] = useState(isEditing)
   const [menuVisible, setMenuVisible] = useState(false)
-  const menuButtonRef = useRef<TouchableOpacity>(null)
 
   useEffect(() => {
     if (itemId) {
-      loadItem()
+      loadItem(itemId)
     }
   }, [itemId])
 
-  const loadItem = async () => {
+  const loadItem = async (id: string) => {
     try {
-      const item = await getItem(itemId)
+      const item = await getItem(id)
       if (item) {
         setName(item.name)
         setDescription(item.description || "")
@@ -150,16 +149,16 @@ export function ItemEditorScreen({ navigation, route }: Props) {
     <ScrollView style={[themed($container), styles.container]}>
       <View style={themed($header)}>
         <TouchableOpacity onPress={onCancel} style={themed($iconButton)}>
-          <Icon icon="back" size={24} color={themedStyles.backIcon.color} />
+          <Icon icon="back" size={24} />
         </TouchableOpacity>
         <Text style={themed($headerTitle)}>{isEditing ? "Edit Item" : "New Item"}</Text>
         {isEditing ? (
-          <TouchableOpacity ref={menuButtonRef} onPress={toggleMenu} style={themed($iconButton)}>
-            <Icon icon="more" size={24} color={themedStyles.backIcon.color} />
+          <TouchableOpacity onPress={toggleMenu} style={themed($iconButton)}>
+            <Icon icon="more" size={24} />
           </TouchableOpacity>
         ) : (
           <TouchableOpacity onPress={handleSave} style={themed($iconButton)}>
-            <Icon icon="check" size={24} color={themedStyles.saveIcon.color} />
+            <Icon icon="check" size={24} />
           </TouchableOpacity>
         )}
       </View>
@@ -168,17 +167,14 @@ export function ItemEditorScreen({ navigation, route }: Props) {
         <Pressable style={themed($modalOverlay)} onPress={() => setMenuVisible(false)}>
           <View style={themed($menuContainer)}>
             <TouchableOpacity style={themed($menuItem)} onPress={onCancel}>
-              <Icon icon="back" size={20} color={themedStyles.menuIcon.color} />
-              <Text style={themed($menuItemText)}></Text>
+              <Icon icon="back" size={20} />
             </TouchableOpacity>
             <View style={themed($menuDivider)} />
             <TouchableOpacity style={themed($menuItem)} onPress={handleEdit}>
-              <Icon icon="settings" size={20} color={themedStyles.menuIcon.color} />
-              <Text style={themed($menuItemText)}></Text>
+              <Icon icon="settings" size={20} />
             </TouchableOpacity>
             <TouchableOpacity style={themed($menuItem)} onPress={handleDelete}>
-              <Icon icon="bell" size={20} color={themedStyles.deleteIcon.color} />
-              <Text style={[themed($menuItemText), { color: themedStyles.deleteIcon.color }]}></Text>
+              <Icon icon="bell" size={20} color={theme.colors.error} />
             </TouchableOpacity>
           </View>
         </Pressable>
@@ -432,6 +428,57 @@ const $propertyInputRow: ViewStyle = {
   gap: 8,
   marginTop: 8,
 }
+
+const $iconButton: ThemedStyle<ViewStyle> = () => ({
+  padding: 8,
+})
+
+const $modalOverlay: ThemedStyle<ViewStyle> = () => ({
+  flex: 1,
+  backgroundColor: "rgba(0, 0, 0, 0.5)",
+  justifyContent: "center",
+  alignItems: "center",
+})
+
+const $menuContainer: ThemedStyle<ViewStyle> = ({ colors }) => ({
+  backgroundColor: colors.backgroundCard,
+  borderRadius: 12,
+  paddingVertical: 8,
+  paddingHorizontal: 16,
+  minWidth: 150,
+  shadowColor: "#000",
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.25,
+  shadowRadius: 4,
+  elevation: 5,
+})
+
+const $menuItem: ViewStyle = {
+  flexDirection: "row",
+  alignItems: "center",
+  paddingVertical: 12,
+  paddingHorizontal: 8,
+}
+
+const $menuItemText: ThemedStyle<TextStyle> = ({ colors }) => ({
+  fontSize: 16,
+  marginLeft: 12,
+  color: colors.text,
+})
+
+const $menuDivider: ThemedStyle<ViewStyle> = ({ colors }) => ({
+  height: 1,
+  backgroundColor: colors.border,
+  marginVertical: 4,
+})
+
+const $menuIcon: ThemedStyle<TextStyle> = ({ colors }) => ({
+  color: colors.text,
+})
+
+const $deleteIcon: ThemedStyle<TextStyle> = ({ colors }) => ({
+  color: colors.error,
+})
 
 const styles = StyleSheet.create({
   container: {

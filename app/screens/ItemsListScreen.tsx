@@ -1,5 +1,5 @@
 import { FC, useState, useRef, useCallback } from "react"
-import { FlatList, TextInput, TextStyle, View, ViewStyle, TouchableOpacity, Alert, ActionSheetIOS } from "react-native"
+import { FlatList, TextInput, TextStyle, View, ViewStyle, TouchableOpacity, Alert } from "react-native"
 import { useFocusEffect } from "@react-navigation/native"
 
 import { Icon, PressableIcon } from "@/components/Icon"
@@ -86,25 +86,12 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
   }
 
   const handleAddNew = () => {
-    ActionSheetIOS.showActionSheetWithOptions(
-      {
-        options: ["Cancel", "Camera", "Gallery", "Manual Entry"],
-        cancelButtonIndex: 0,
-      },
-      (buttonIndex) => {
-        switch (buttonIndex) {
-          case 1:
-            navigation.navigate("NewItemCameraScan")
-            break
-          case 2:
-            navigation.navigate("GalleryPicker", { mode: "single" })
-            break
-          case 3:
-            navigation.navigate("ItemEditor", {})
-            break
-        }
-      }
-    )
+    Alert.alert("Add New Item", "Choose how to add", [
+      { text: "Camera", onPress: () => navigation.navigate("NewItemCameraScan") },
+      { text: "Gallery", onPress: () => navigation.navigate("GalleryPicker", { mode: "single" }) },
+      { text: "Manual Entry", onPress: () => navigation.navigate("ItemEditor", {}) },
+      { text: "Cancel", style: "cancel" },
+    ])
   }
 
   const handleSettings = () => {
@@ -155,7 +142,7 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
             style={themed($addButton)}
             onPress={handleAddNew}
           >
-            <Text style={{ color: theme.colors.textInverse, fontSize: 26, fontWeight: "300", lineHeight: 28 }}>+</Text>
+            <PressableIcon icon="bell" color={theme.colors.textInverse} size={28} />
           </TouchableOpacity>
           <PressableIcon
             icon="settings"
@@ -203,7 +190,7 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
           style={themed($addButton)}
           onPress={handleAddNew}
         >
-          <Text style={{ color: theme.colors.textInverse, fontSize: 26, fontWeight: "300", lineHeight: 28 }}>+</Text>
+          <PressableIcon icon="bell" color={theme.colors.textInverse} size={28} />
         </TouchableOpacity>
       </View>
     )
