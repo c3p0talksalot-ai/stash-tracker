@@ -28,6 +28,7 @@ const MOCK_ITEMS: ItemData[] = [
 
 export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
   const { themed, theme } = useAppTheme()
+  const { colors } = theme
   const { handedness } = useSettings()
   const [items] = useState<ItemData[]>(MOCK_ITEMS)
   const [searchQuery, setSearchQuery] = useState("")
@@ -155,9 +156,29 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
 
   return (
     <Screen preset="fixed" contentContainerStyle={[$styles.flex1, $containerInsets]}>
-      {/* Header */}
+      {/* Header with Title and Search */}
       <View style={themed($header)}>
         <Text preset="heading">My Items</Text>
+        {isSearchActive ? (
+          <TextInput
+            ref={searchInputRef}
+            style={themed($headerSearchInput)}
+            placeholder="Search..."
+            placeholderTextColor={colors.text}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            onBlur={() => !searchQuery && setIsSearchActive(false)}
+            autoFocus
+          />
+        ) : (
+          <PressableIcon
+            icon="view"
+            color={theme.colors.text}
+            size={24}
+            containerStyle={themed($searchIcon)}
+            onPress={handleSearchToggle}
+          />
+        )}
       </View>
 
       {/* Items List */}
@@ -186,10 +207,28 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
 }
 
 const $header: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
   paddingHorizontal: spacing.lg,
   paddingVertical: spacing.md,
   borderBottomWidth: 1,
   borderBottomColor: colors.border,
+})
+
+const $headerSearchInput: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
+  flex: 1,
+  marginLeft: spacing.md,
+  backgroundColor: colors.palette.neutral200,
+  borderRadius: 8,
+  paddingHorizontal: spacing.md,
+  paddingVertical: spacing.sm,
+  color: colors.text,
+  fontSize: 16,
+})
+
+const $searchIcon: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  padding: spacing.xs,
 })
 
 const $listContent: ThemedStyle<ViewStyle> = ({ spacing }) => ({
