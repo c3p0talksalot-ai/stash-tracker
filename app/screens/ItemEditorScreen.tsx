@@ -62,19 +62,18 @@ export function ItemEditorScreen({ navigation, route }: Props) {
     }
   }, [name, description, location, tags, properties, loading, isEditing, getCurrentDataHash])
 
-  // Save on blur - no debounce, save immediately when field loses focus
-  const handleBlur = useCallback(() => { console.log("!!! BLUR FIRED, name currently:", name)
-    // Debounce: prevent saves within 1 second of each other
+  // Save on blur - defer slightly to let React flush state updates
+  const handleBlur = useCallback(() => {
     const now = Date.now()
     if (now - lastSaveTime.current < 1000) {
-      console.log("handleBlur blocked - too soon after last save")
       return
     }
-    console.log("handleBlur called", { autosave, hasUnsavedChanges, isSaving, isEditing, isInitialLoad: isInitialLoad.current, timeSinceLastSave: now - lastSaveTime.current })
     if (autosave && hasUnsavedChanges && !isSaving && isEditing && !isInitialLoad.current) {
-      console.log("-> calling handleSaveInternal")
-      lastSaveTime.current = now
-      handleSaveInternal()
+      // Defer to next event loop tick so state has time to update
+      setTimeout(() => {
+        lastSaveTime.current = Date.now()
+        handleSaveInternal()
+      }, 0)
     }
   }, [autosave, hasUnsavedChanges, isSaving, isEditing])
 
@@ -331,10 +330,10 @@ export function ItemEditorScreen({ navigation, route }: Props) {
           <TextInput
             style={themed($input)}
             value={name}
-            onChangeText={(text) => { console.log("!!! TYPING name:", text); setName(text) }}
+            onChangeText={(text) => { setName(text) }}
             placeholder="Enter item name"
             placeholderTextColor={colors.textDim}
-            onEndEditing={handleBlur}
+            onBlur={handleBlur}
           />
         </View>
 
@@ -343,10 +342,10 @@ export function ItemEditorScreen({ navigation, route }: Props) {
           <TextInput
             style={themed($input)}
             value={location}
-            onChangeText={(text) => { console.log("!!! TYPING location:", text); setLocation(text) }}
+            onChangeText={(text) => { setLocation(text) }}
             placeholder="e.g., Garage, Closet"
             placeholderTextColor={colors.textDim}
-            onEndEditing={handleBlur}
+            onBlur={handleBlur}
           />
         </View>
 
@@ -355,11 +354,11 @@ export function ItemEditorScreen({ navigation, route }: Props) {
           <TextInput
             style={[themed($input), { minHeight: 80, textAlignVertical: "top" }]}
             value={description}
-            onChangeText={(text) => { console.log("!!! TYPING description:", text); setDescription(text) }}
+            onChangeText={(text) => { setDescription(text) }}
             placeholder="Enter description"
             placeholderTextColor={colors.textDim}
             multiline
-            onEndEditing={handleBlur}
+            onBlur={handleBlur}
           />
         </View>
 
@@ -380,7 +379,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
                 placeholder="+"
                 placeholderTextColor={colors.textDim}
                 onSubmitEditing={() => { addTag(newTag); handleBlur(); }}
-                onEndEditing={handleBlur}
+                onBlur={handleBlur}
               />
             </View>
           </View>
