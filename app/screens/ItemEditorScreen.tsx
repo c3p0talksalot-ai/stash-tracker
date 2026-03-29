@@ -63,7 +63,9 @@ export function ItemEditorScreen({ navigation, route }: Props) {
 
   // Save on blur - no debounce, save immediately when field loses focus
   const handleBlur = useCallback(() => {
+    console.log("handleBlur called", { autosave, hasUnsavedChanges, isSaving, isEditing, isInitialLoad: isInitialLoad.current })
     if (autosave && hasUnsavedChanges && !isSaving && isEditing && !isInitialLoad.current) {
+      console.log("-> calling handleSaveInternal")
       handleSaveInternal()
     }
   }, [autosave, hasUnsavedChanges, isSaving, isEditing])
@@ -104,6 +106,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
   }, [itemId])
 
   const loadItem = async (id: string) => {
+    console.log("loadItem", id)
     try {
       const item = await getItem(id)
       if (item) {
@@ -166,6 +169,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
       setNewPropValue("")
       setNewPropUnit("")
       // Trigger save after adding property
+      console.log("addProperty, triggering save", { autosave, isEditing, isSaving })
       if (autosave && isEditing && !isSaving) {
         handleSaveInternal()
       }
@@ -178,6 +182,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
 
   // Internal save function used by autosave and manual save
   const handleSaveInternal = async (skipReload = false) => {
+    console.log("handleSaveInternal", { isEditing, itemId, name, description, location, tags, properties })
     if (!name.trim()) {
       if (!autosave) {
         Alert.alert("Error", "Please enter an item name")
