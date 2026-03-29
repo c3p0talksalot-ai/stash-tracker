@@ -3,6 +3,7 @@ import { StyleSheet, View, Text, ScrollView, TouchableOpacity, TextStyle, ViewSt
 import { useAppTheme } from "@/theme/context"
 import { getItem, deleteItem } from "@/services/items"
 import type { AppStackScreenProps } from "@/navigators/navigationTypes"
+import type { ThemedStyle } from "@/theme/types"
 
 type Props = AppStackScreenProps<"ItemDetail">
 
@@ -149,158 +150,171 @@ export function ItemDetailScreen({ navigation, route }: Props) {
   )
 }
 
-const $container: ViewStyle = {
+const $container: ThemedStyle<ViewStyle> = ({ colors }) => ({
   flex: 1,
-  backgroundColor: "background",
-}
+  backgroundColor: colors.background,
+})
 
-const $header: ViewStyle = {
+const $header: ThemedStyle<ViewStyle> = ({ colors }) => ({
   flexDirection: "row",
   justifyContent: "space-between",
   alignItems: "center",
   padding: 16,
   paddingTop: 48,
-}
+  borderBottomWidth: 1,
+  borderBottomColor: colors.border,
+})
 
-const $backButton: ViewStyle = {
+const $backButton: ThemedStyle<ViewStyle> = () => ({
   padding: 8,
-}
+})
 
-const $backText: TextStyle = {
+const $backText: ThemedStyle<TextStyle> = ({ colors }) => ({
   fontSize: 16,
-  color: "primary",
-}
+  color: colors.tint,
+})
 
-const $headerActions: ViewStyle = {
+const $headerActions: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   flexDirection: "row",
-  gap: 16,
-}
+  gap: spacing.md,
+})
 
-const $editButton: ViewStyle = {
+const $editButton: ThemedStyle<ViewStyle> = () => ({
   padding: 8,
-}
+})
 
-const $editText: TextStyle = {
+const $editText: ThemedStyle<TextStyle> = ({ colors }) => ({
   fontSize: 16,
-  color: "primary",
+  color: colors.tint,
   fontWeight: "600",
-}
+})
 
-const $deleteButton: ViewStyle = {
+const $deleteButton: ThemedStyle<ViewStyle> = () => ({
   padding: 8,
-}
+})
 
-const $deleteText: TextStyle = {
+const $deleteText: ThemedStyle<TextStyle> = ({ colors }) => ({
   fontSize: 16,
-  color: "error",
-}
+  color: colors.error,
+})
 
-const $content: ViewStyle = {
-  padding: 16,
-}
+const $content: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  padding: spacing.md,
+})
 
-const $itemName: TextStyle = {
+const $itemName: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
   fontSize: 28,
   fontWeight: "bold",
-  marginBottom: 16,
-}
+  marginBottom: spacing.md,
+  color: colors.text,
+})
 
-const $locationRow: ViewStyle = {
+const $locationRow: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   flexDirection: "row",
-  marginBottom: 24,
-}
+  marginBottom: spacing.lg,
+})
 
-const $locationLabel: TextStyle = {
+const $locationLabel: ThemedStyle<TextStyle> = ({ colors }) => ({
   fontSize: 16,
   marginRight: 8,
-}
+  color: colors.text,
+})
 
-const $locationValue: TextStyle = {
+const $locationValue: ThemedStyle<TextStyle> = ({ colors }) => ({
   fontSize: 16,
   opacity: 0.8,
-}
+  color: colors.text,
+})
 
-const $section: ViewStyle = {
-  marginBottom: 24,
-}
+const $section: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  marginBottom: spacing.lg,
+})
 
-const $sectionTitle: TextStyle = {
+const $sectionTitle: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
   fontSize: 18,
   fontWeight: "600",
-  marginBottom: 12,
-}
+  marginBottom: spacing.sm,
+  color: colors.text,
+})
 
-const $tagsContainer: ViewStyle = {
+const $tagsContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   flexDirection: "row",
   flexWrap: "wrap",
-  gap: 8,
-}
+  gap: spacing.sm,
+})
 
-const $tagBadge: ViewStyle = {
+const $tagBadge: ThemedStyle<ViewStyle> = ({ colors }) => ({
   paddingHorizontal: 12,
   paddingVertical: 6,
   borderRadius: 8,
-  backgroundColor: "primary",
-}
+  backgroundColor: colors.tint,
+})
 
-const $tagText: TextStyle = {
+const $tagText: ThemedStyle<TextStyle> = () => ({
   fontSize: 14,
   color: "white",
-}
+})
 
-const $propertyRow: ViewStyle = {
+const $propertyRow: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   flexDirection: "row",
-  paddingVertical: 8,
+  paddingVertical: spacing.sm,
   borderBottomWidth: 1,
-  borderBottomColor: "border",
-}
+  borderBottomColor: colors.border,
+})
 
-const $propertyKey: TextStyle = {
+const $propertyKey: ThemedStyle<TextStyle> = ({ colors }) => ({
   fontSize: 16,
   fontWeight: "500",
   width: 100,
-}
+  color: colors.text,
+})
 
-const $propertyValue: TextStyle = {
+const $propertyValue: ThemedStyle<TextStyle> = ({ colors }) => ({
   fontSize: 16,
   flex: 1,
-}
+  color: colors.text,
+})
 
-const $propertyUnit: TextStyle = {
+const $propertyUnit: ThemedStyle<TextStyle> = ({ colors }) => ({
   opacity: 0.6,
   fontSize: 14,
-}
+  color: colors.text,
+})
 
-const $noProperties: TextStyle = {
+const $noProperties: ThemedStyle<TextStyle> = ({ colors }) => ({
   fontSize: 16,
   opacity: 0.5,
   fontStyle: "italic",
-}
+  color: colors.text,
+})
 
-const $createdDate: TextStyle = {
+const $createdDate: ThemedStyle<TextStyle> = ({ colors }) => ({
   fontSize: 16,
   opacity: 0.7,
-}
+  color: colors.text,
+})
 
-const $loadingText: TextStyle = {
+const $loadingText: ThemedStyle<TextStyle> = ({ colors }) => ({
   fontSize: 16,
   textAlign: "center",
   marginTop: 40,
   opacity: 0.5,
-}
+  color: colors.text,
+})
 
-const $errorText: TextStyle = {
+const $errorText: ThemedStyle<TextStyle> = ({ colors }) => ({
   fontSize: 16,
   textAlign: "center",
   marginTop: 40,
   opacity: 0.5,
-  color: "error",
-}
+  color: colors.error,
+})
 
-const $description: TextStyle = {
+const $description: ThemedStyle<TextStyle> = ({ colors }) => ({
   fontSize: 16,
   lineHeight: 24,
-}
+  color: colors.text,
+})
 
 const styles = StyleSheet.create({
   container: {

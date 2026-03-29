@@ -13,6 +13,7 @@ import {
 import { useAppTheme } from "@/theme/context"
 import { getItem, createItem, updateItem } from "@/services/items"
 import type { AppStackScreenProps } from "@/navigators/navigationTypes"
+import type { ThemedStyle } from "@/theme/types"
 
 type Props = AppStackScreenProps<"ItemEditor">
 
@@ -232,67 +233,70 @@ export function ItemEditorScreen({ navigation, route }: Props) {
   )
 }
 
-const $container: ViewStyle = {
+const $container: ThemedStyle<ViewStyle> = ({ colors }) => ({
   flex: 1,
-  backgroundColor: "background",
-}
+  backgroundColor: colors.background,
+})
 
-const $header: ViewStyle = {
+const $header: ThemedStyle<ViewStyle> = ({ colors }) => ({
   flexDirection: "row",
   justifyContent: "space-between",
   alignItems: "center",
   padding: 16,
   paddingTop: 48,
   borderBottomWidth: 1,
-  borderBottomColor: "border",
-}
+  borderBottomColor: colors.border,
+})
 
-const $headerTitle: TextStyle = {
+const $headerTitle: ThemedStyle<TextStyle> = ({ colors }) => ({
   fontSize: 18,
   fontWeight: "600",
-}
+  color: colors.text,
+})
 
-const $cancelButton: ViewStyle = {
+const $cancelButton: ThemedStyle<ViewStyle> = () => ({
   padding: 8,
-}
+})
 
-const $cancelText: TextStyle = {
+const $cancelText: ThemedStyle<TextStyle> = ({ colors }) => ({
   fontSize: 16,
-  color: "text",
-}
+  color: colors.text,
+})
 
-const $saveButton: ViewStyle = {
+const $saveButton: ThemedStyle<ViewStyle> = () => ({
   padding: 8,
-}
+})
 
-const $saveText: TextStyle = {
+const $saveText: ThemedStyle<TextStyle> = ({ colors }) => ({
   fontSize: 16,
-  color: "primary",
+  color: colors.tint,
   fontWeight: "600",
-}
+})
 
-const $content: ViewStyle = {
-  padding: 16,
-}
+const $content: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  padding: spacing.md,
+})
 
-const $field: ViewStyle = {
-  marginBottom: 24,
-}
+const $field: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  marginBottom: spacing.lg,
+})
 
-const $label: TextStyle = {
+const $label: ThemedStyle<TextStyle> = ({ colors }) => ({
   fontSize: 16,
   fontWeight: "600",
   marginBottom: 8,
-}
+  color: colors.text,
+})
 
-const $input: TextStyle = {
+const $input: ThemedStyle<TextStyle> = ({ colors }) => ({
   padding: 12,
   borderRadius: 8,
   fontSize: 16,
-  backgroundColor: "card",
+  backgroundColor: colors.backgroundCard,
   borderWidth: 1,
-  borderColor: "border",
-}
+  borderColor: colors.border,
+  color: colors.text,
+})
 
 const $tagsContainer: ViewStyle = {
   flexDirection: "row",
