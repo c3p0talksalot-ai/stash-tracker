@@ -334,7 +334,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
             onChangeText={(text) => { console.log("!!! TYPING name:", text); setName(text) }}
             placeholder="Enter item name"
             placeholderTextColor={colors.textDim}
-            onBlur={handleBlur}
+            onEndEditing={handleBlur}
           />
         </View>
 
@@ -346,7 +346,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
             onChangeText={(text) => { console.log("!!! TYPING location:", text); setLocation(text) }}
             placeholder="e.g., Garage, Closet"
             placeholderTextColor={colors.textDim}
-            onBlur={handleBlur}
+            onEndEditing={handleBlur}
           />
         </View>
 
@@ -359,7 +359,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
             placeholder="Enter description"
             placeholderTextColor={colors.textDim}
             multiline
-            onBlur={handleBlur}
+            onEndEditing={handleBlur}
           />
         </View>
 
@@ -380,7 +380,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
                 placeholder="+"
                 placeholderTextColor={colors.textDim}
                 onSubmitEditing={() => { addTag(newTag); handleBlur(); }}
-                onBlur={handleBlur}
+                onEndEditing={handleBlur}
               />
             </View>
           </View>
