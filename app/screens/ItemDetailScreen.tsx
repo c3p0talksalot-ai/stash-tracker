@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import {
   StyleSheet,
   View,
@@ -12,7 +12,9 @@ import {
   Modal,
   Pressable,
 } from "react-native"
+import { useNavigation } from "@react-navigation/native"
 import { useAppTheme } from "@/theme/context"
+import { useSettings } from "@/context/SettingsContext"
 import { getItem, createItem, updateItem, deleteItem } from "@/services/items"
 import { Icon } from "@/components/Icon"
 import type { AppStackScreenProps } from "@/navigators/navigationTypes"
@@ -33,10 +35,17 @@ interface ItemData {
 export function ItemDetailScreen({ navigation, route }: Props) {
   const { itemId } = route.params || {}
   const { themed, theme } = useAppTheme()
+  const { autosave } = useSettings()
+  const navigationInstance = useNavigation()
+  
   const [item, setItem] = useState<ItemData | null>(null)
   const [loading, setLoading] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
   const [menuVisible, setMenuVisible] = useState(false)
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const isInitialLoad = useRef(true)
+  const originalItemData = useRef<string>("")
 
   // Edit form state
   const [name, setName] = useState("")
@@ -48,6 +57,63 @@ export function ItemDetailScreen({ navigation, route }: Props) {
   const [newPropKey, setNewPropKey] = useState("")
   const [newPropValue, setNewPropValue] = useState("")
   const [newPropUnit, setNewPropUnit] = useState("")
+
+  // Track original data to detect changes
+  const getCurrentDataHash = useCallback(() => {
+    return JSON.stringify({ name, description, location, tags, properties })
+  }, [name, description, location, tags, properties])
+
+  // Check for unsaved changes
+  useEffect(() => {
+    if (!isInitialLoad.current && !loading && item) {
+      const currentHash = getCurrentDataHash()
+      setHasUnsavedChanges(currentHash !== originalItemData.current)
+    }
+  }, [name, description, location, tags, properties, loading, item, getCurrentDataHash])
+
+  // Autosave when fields change (with debounce)
+  useEffect(() => {
+    if (!isInitialLoad.current && autosave && hasUnsavedChanges && !isSaving && !loading && item) {
+      const timer = setTimeout(async () => {
+        if (autosave && hasUnsavedChanges && !isSaving) {
+          await handleSaveInternal()
+        }
+      }, 1000) // 1 second debounce for autosave
+      return () => clearTimeout(timer)
+    }
+    return undefined
+  }, [autosave, hasUnsavedChanges, isSaving, loading, item])
+
+  // Warn before navigating away with unsaved changes
+  useEffect(() => {
+    const unsubscribe = navigationInstance.addListener("beforeRemove", (e) => {
+      if (hasUnsavedChanges && !isSaving) {
+        e.preventDefault()
+        Alert.alert(
+          "Unsaved Changes",
+          "You have unsaved changes. Do you want to save before leaving?",
+          [
+            { text: "Continue Editing", style: "cancel" },
+            {
+              text: "Discard Changes",
+              style: "destructive",
+              onPress: () => {
+                navigationInstance.dispatch(e.data.action)
+              },
+            },
+            {
+              text: "Save & Exit",
+              onPress: async () => {
+                await handleSaveInternal(true)
+                navigationInstance.dispatch(e.data.action)
+              },
+            },
+          ]
+        )
+      }
+    })
+    return unsubscribe
+  }, [hasUnsavedChanges, isSaving, navigationInstance])
 
   useEffect(() => {
     loadItem()
@@ -63,10 +129,23 @@ export function ItemDetailScreen({ navigation, route }: Props) {
         setLocation(data.location || "")
         setTags(data.tags)
         setProperties(data.properties)
+        // Store original data hash for change detection
+        originalItemData.current = JSON.stringify({
+          name: data.name,
+          description: data.description || "",
+          location: data.location || "",
+          tags: data.tags,
+          properties: data.properties,
+        })
+        // If autosave is on, go directly to edit mode
+        if (autosave) {
+          setIsEditing(true)
+        }
       }
     } catch (e) {
       console.error("Failed to load item:", e)
     } finally {
+      isInitialLoad.current = false
       setLoading(false)
     }
   }
@@ -76,23 +155,40 @@ export function ItemDetailScreen({ navigation, route }: Props) {
   }
 
   const cancelEdit = () => {
-    // Reset to original values
-    if (item) {
-      setName(item.name)
-      setDescription(item.description || "")
-      setLocation(item.location || "")
-      setTags(item.tags)
-      setProperties(item.properties)
+    // When autosave is on, just reset to original values but stay in edit mode
+    if (autosave) {
+      if (item) {
+        setName(item.name)
+        setDescription(item.description || "")
+        setLocation(item.location || "")
+        setTags(item.tags)
+        setProperties(item.properties)
+        originalItemData.current = getCurrentDataHash()
+        setHasUnsavedChanges(false)
+      }
+    } else {
+      // When autosave is off, revert and exit edit mode
+      if (item) {
+        setName(item.name)
+        setDescription(item.description || "")
+        setLocation(item.location || "")
+        setTags(item.tags)
+        setProperties(item.properties)
+      }
+      setIsEditing(false)
     }
-    setIsEditing(false)
   }
 
-  const saveEdit = async () => {
+  // Internal save function used by autosave and manual save
+  const handleSaveInternal = async (skipReload = false) => {
     if (!name.trim()) {
-      Alert.alert("Error", "Please enter an item name")
+      if (!autosave) {
+        Alert.alert("Error", "Please enter an item name")
+      }
       return
     }
 
+    setIsSaving(true)
     try {
       await updateItem(itemId, {
         name: name.trim(),
@@ -101,13 +197,32 @@ export function ItemDetailScreen({ navigation, route }: Props) {
         tags,
         properties,
       })
-      await loadItem()
-      setIsEditing(false)
+      // Update original data hash after save
+      originalItemData.current = getCurrentDataHash()
+      setHasUnsavedChanges(false)
+      if (!skipReload) {
+        await loadItem()
+      }
     } catch (e) {
       console.error("Failed to save item:", e)
-      Alert.alert("Error", "Failed to save item")
+      if (!autosave) {
+        Alert.alert("Error", "Failed to save item")
+      }
+    } finally {
+      setIsSaving(false)
     }
   }
+
+  const saveEdit = async () => {
+    await handleSaveInternal()
+  }
+
+  // Autosave handler - saves immediately when autosave is on
+  const handleAutosave = useCallback(async () => {
+    if (autosave && hasUnsavedChanges && !isSaving) {
+      await handleSaveInternal()
+    }
+  }, [autosave, hasUnsavedChanges, isSaving])
 
   const handleDelete = () => {
     setMenuVisible(false)
@@ -184,7 +299,13 @@ export function ItemDetailScreen({ navigation, route }: Props) {
           <TouchableOpacity onPress={cancelEdit} style={themed($iconButton)}>
             <Icon icon="back" size={24} />
           </TouchableOpacity>
-          <Text style={themed($headerTitle)}>Edit Item</Text>
+          <View style={themed($headerTitleContainer)}>
+            <Text style={themed($headerTitle)}>Edit Item</Text>
+            {autosave && hasUnsavedChanges && (
+              <Text style={themed($savingText)}>{isSaving ? "Saving..." : "Unsaved"}</Text>
+            )}
+          </View>
+          {/* Always show save button for manual save (even when autosave is on) */}
           <TouchableOpacity onPress={saveEdit} style={themed($iconButton)}>
             <Icon icon="check" size={24} />
           </TouchableOpacity>
@@ -396,6 +517,17 @@ const $headerTitle: ThemedStyle<TextStyle> = ({ colors }) => ({
   color: colors.text,
   flex: 1,
   textAlign: "center",
+})
+
+const $headerTitleContainer: ThemedStyle<ViewStyle> = () => ({
+  flex: 1,
+  alignItems: "center",
+})
+
+const $savingText: ThemedStyle<TextStyle> = ({ colors }) => ({
+  fontSize: 12,
+  color: colors.tint,
+  marginTop: 2,
 })
 
 const $iconButton: ThemedStyle<ViewStyle> = () => ({
