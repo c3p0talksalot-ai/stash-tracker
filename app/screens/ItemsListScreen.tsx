@@ -155,47 +155,49 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
   }
 
   return (
-    <Screen preset="fixed" contentContainerStyle={[$styles.flex1, $containerInsets]}>
-      {/* Header with Title and Search */}
-      <View style={themed($header)}>
-        <Text preset="heading">My Items</Text>
-        {isSearchActive ? (
-          <TextInput
-            ref={searchInputRef}
-            style={themed($headerSearchInput)}
-            placeholder="Search..."
-            placeholderTextColor={colors.text}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            onBlur={() => !searchQuery && setIsSearchActive(false)}
-            autoFocus
-          />
-        ) : (
-          <PressableIcon
-            icon="view"
-            color={theme.colors.text}
-            size={24}
-            containerStyle={themed($searchIcon)}
-            onPress={handleSearchToggle}
-          />
-        )}
-      </View>
+    <Screen preset="fixed" contentContainerStyle={$containerInsets}>
+      <View style={themed($contentWrapper)}>
+        {/* Header with Title and Search */}
+        <View style={themed($header)}>
+          <Text preset="heading">My Items</Text>
+          {isSearchActive ? (
+            <TextInput
+              ref={searchInputRef}
+              style={themed($headerSearchInput)}
+              placeholder="Search..."
+              placeholderTextColor={colors.text}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              onBlur={() => !searchQuery && setIsSearchActive(false)}
+              autoFocus
+            />
+          ) : (
+            <PressableIcon
+              icon="view"
+              color={theme.colors.text}
+              size={24}
+              containerStyle={themed($searchIcon)}
+              onPress={handleSearchToggle}
+            />
+          )}
+        </View>
 
-      {/* Items List */}
-      <FlatList
-        data={items}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        contentContainerStyle={themed($listContent)}
-        ListEmptyComponent={
-          <View style={themed($emptyState)}>
-            <Text preset="subheading">No items yet</Text>
-            <Text size="sm" style={themed($itemDesc)}>
-              Tap + to add your first item
-            </Text>
-          </View>
-        }
-      />
+        {/* Items List */}
+        <FlatList
+          data={items}
+          keyExtractor={(item) => item.id}
+          renderItem={renderItem}
+          contentContainerStyle={themed($listContent)}
+          ListEmptyComponent={
+            <View style={themed($emptyState)}>
+              <Text preset="subheading">No items yet</Text>
+              <Text size="sm" style={themed($itemDesc)}>
+                Tap + to add your first item
+              </Text>
+            </View>
+          }
+        />
+      </View>
 
       {/* Bottom Navigation Bar */}
       <View style={themed($bottomNav)}>
@@ -205,6 +207,11 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
     </Screen>
   )
 }
+
+const $contentWrapper: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  flex: 1,
+  paddingBottom: spacing.xl, // space for bottom nav
+})
 
 const $header: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   flexDirection: "row",
