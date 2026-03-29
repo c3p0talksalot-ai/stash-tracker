@@ -106,7 +106,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
   }, [itemId])
 
   const loadItem = async (id: string) => {
-    console.log("loadItem", id)
+    console.log("loadItem", id, JSON.stringify(item))
     try {
       const item = await getItem(id)
       if (item) {
