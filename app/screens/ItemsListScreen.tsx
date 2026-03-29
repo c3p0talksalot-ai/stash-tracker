@@ -142,7 +142,7 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
             style={themed($addButton)}
             onPress={handleAddNew}
           >
-            <PressableIcon icon="bell" color={theme.colors.textInverse} size={28} />
+            <PressableIcon icon="plus" color={theme.colors.textInverse} size={28} />
           </TouchableOpacity>
           <PressableIcon
             icon="settings"
@@ -190,7 +190,7 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
           style={themed($addButton)}
           onPress={handleAddNew}
         >
-          <PressableIcon icon="bell" color={theme.colors.textInverse} size={28} />
+          <PressableIcon icon="plus" color={theme.colors.textInverse} size={28} />
         </TouchableOpacity>
       </View>
     )
