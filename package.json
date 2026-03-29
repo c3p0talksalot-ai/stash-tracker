@@ -4,8 +4,8 @@
   "private": true,
   "main": "index.tsx",
   "scripts": {
-    "start": "expo start --dev-client",
-    "an": "expo run:android",
+    "start": "unset PREFIX && source /opt/homebrew/opt/nvm/nvm.sh && nvm use 24 && expo start --dev-client",
+    "an": "unset PREFIX && source /opt/homebrew/opt/nvm/nvm.sh && nvm use 24 && export JAVA_HOME=/opt/homebrew/Cellar/openjdk@17/17.0.18/libexec/openjdk.jdk/Contents/Home && expo run:android",
     "list": "lsof -i :8080",
     "kill": "kill -9 $(lsof -t -i:8080)",
     "android": "expo run:android",
