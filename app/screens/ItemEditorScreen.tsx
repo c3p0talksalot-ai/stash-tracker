@@ -478,6 +478,7 @@ const $tagInput: ThemedStyle<TextStyle> = ({ colors }) => ({
   padding: 12,
   borderRadius: 8,
   fontSize: 16,
+  backgroundColor: colors.backgroundCard,
   color: colors.text,
   borderColor: colors.border,
 })
