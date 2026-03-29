@@ -155,9 +155,9 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
   }
 
   return (
-    <Screen preset="fixed" contentContainerStyle={$containerInsets}>
-      <View style={themed($contentWrapper)}>
-        {/* Header with Title and Search */}
+    <Screen preset="fixed" contentContainerStyle={[$styles.flex1, $containerInsets]}>
+      {/* Scrollable content area */}
+      <View style={themed($contentArea)}>
         <View style={themed($header)}>
           <Text preset="heading">My Items</Text>
           {isSearchActive ? (
@@ -182,7 +182,6 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
           )}
         </View>
 
-        {/* Items List */}
         <FlatList
           data={items}
           keyExtractor={(item) => item.id}
@@ -208,9 +207,9 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
   )
 }
 
-const $contentWrapper: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+const $contentArea: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   flex: 1,
-  paddingBottom: spacing.xl, // space for bottom nav
+  paddingBottom: spacing.md,
 })
 
 const $header: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
