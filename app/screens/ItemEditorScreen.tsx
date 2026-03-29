@@ -190,7 +190,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
 
   // Internal save function used by autosave and manual save
   const handleSaveInternal = async (skipReload = false) => {
-    console.log("handleSaveInternal", { isEditing, itemId, name, description, location, tags, properties })
+    console.log("handleSaveInternal", { nameVal: name, descVal: description, locVal: location, isEditing, itemId, name, description, location, tags, properties })
     if (!name.trim()) {
       if (!autosave) {
         Alert.alert("Error", "Please enter an item name")
