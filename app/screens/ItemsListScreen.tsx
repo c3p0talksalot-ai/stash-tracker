@@ -349,6 +349,8 @@ const $addButton: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   justifyContent: "center",
   backgroundColor: colors.tint,
   borderRadius: 22,
+  borderWidth: 2,
+  borderColor: colors.border,
   zIndex: 1000,
 })
 
