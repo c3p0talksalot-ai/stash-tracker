@@ -246,7 +246,7 @@ const $handle: ViewStyle = {
   backgroundColor: "white",
   borderRadius: HANDLE_SIZE / 2,
   borderWidth: 2,
-  borderColor: "#333",
+  borderColor: colors.border,
 }
 
 const $handleNW: ViewStyle = {

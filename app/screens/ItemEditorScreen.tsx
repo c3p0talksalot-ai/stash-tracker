@@ -23,6 +23,7 @@ type Props = AppStackScreenProps<"ItemEditor">
 export function ItemEditorScreen({ navigation, route }: Props) {
   const { itemId } = route.params || {}
   const { themed, theme } = useAppTheme()
+  const { colors } = theme
   const isEditing = !!itemId
 
   const [name, setName] = useState("")
@@ -198,7 +199,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
             value={name}
             onChangeText={setName}
             placeholder="Enter item name"
-            placeholderTextColor="#999"
+            placeholderTextColor={colors.textDim}
           />
         </View>
 
@@ -209,7 +210,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
             value={location}
             onChangeText={setLocation}
             placeholder="e.g., Garage, Closet"
-            placeholderTextColor="#999"
+            placeholderTextColor={colors.textDim}
           />
         </View>
 
@@ -220,7 +221,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
             value={description}
             onChangeText={setDescription}
             placeholder="Enter description"
-            placeholderTextColor="#999"
+            placeholderTextColor={colors.textDim}
             multiline
           />
         </View>
@@ -240,7 +241,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
                 value={newTag}
                 onChangeText={setNewTag}
                 placeholder="+"
-                placeholderTextColor="#999"
+                placeholderTextColor={colors.textDim}
                 onSubmitEditing={() => addTag(newTag)}
               />
             </View>
@@ -266,14 +267,14 @@ export function ItemEditorScreen({ navigation, route }: Props) {
               value={newPropKey}
               onChangeText={setNewPropKey}
               placeholder="Key (e.g., brand)"
-              placeholderTextColor="#999"
+              placeholderTextColor={colors.textDim}
             />
             <TextInput
               style={[themed($input), { flex: 1, marginRight: 8 }]}
               value={newPropValue}
               onChangeText={setNewPropValue}
               placeholder="Value"
-              placeholderTextColor="#999"
+              placeholderTextColor={colors.textDim}
             />
           </View>
           <View style={themed($propertyInputRow)}>
@@ -282,7 +283,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
               value={newPropUnit}
               onChangeText={setNewPropUnit}
               placeholder="Unit (optional)"
-              placeholderTextColor="#999"
+              placeholderTextColor={colors.textDim}
             />
             <TouchableOpacity onPress={addProperty} style={themed($addButton)}>
               <Text style={themed($addButtonText)}>Add</Text>
