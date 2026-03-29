@@ -129,13 +129,12 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
     if (isLeftHanded) {
       return (
         <View style={themed($navSideInner)}>
-          <PressableIcon
-            icon="more"
-            color={theme.colors.tint}
-            size={32}
-            containerStyle={themed($navIconAdd)}
+          <TouchableOpacity
+            style={themed($addButton)}
             onPress={handleAddNew}
-          />
+          >
+            <Text preset="heading" style={{ color: theme.colors.tint, fontSize: 28 }}>+</Text>
+          </TouchableOpacity>
           <PressableIcon
             icon="settings"
             color={theme.colors.text}
@@ -184,13 +183,12 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
           containerStyle={themed($navIcon)}
           onPress={handleSettings}
         />
-        <PressableIcon
-          icon="more"
-          color={theme.colors.tint}
-          size={32}
-          containerStyle={themed($navIconAdd)}
+        <TouchableOpacity
+          style={themed($addButton)}
           onPress={handleAddNew}
-        />
+        >
+          <Text preset="heading" style={{ color: theme.colors.tint, fontSize: 28 }}>+</Text>
+        </TouchableOpacity>
       </View>
     )
   }
@@ -327,11 +325,11 @@ const $searchInput: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
 const $bottomNav: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   position: "absolute",
   right: 0,
-  top: 100, // Start below header for easy thumb reach
-  bottom: 100, // End above soft buttons
+  bottom: 100, // Start 100px above soft buttons
   width: 64,
+  height: 200, // Fixed height for menu area
   flexDirection: "column",
-  justifyContent: "flex-start",
+  justifyContent: "flex-end", // Start from bottom for thumb reach
   alignItems: "center",
   paddingVertical: spacing.lg,
   gap: spacing.md,
@@ -352,6 +350,14 @@ const $navSide: ThemedStyle<ViewStyle> = ({ spacing }) => ({
 
 const $navIcon: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   padding: spacing.sm,
+})
+
+const $addButton: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  padding: spacing.sm,
+  width: 40,
+  height: 40,
+  alignItems: "center",
+  justifyContent: "center",
 })
 
 const $navIconAdd: ThemedStyle<ViewStyle> = ({ spacing }) => ({
