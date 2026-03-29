@@ -19,11 +19,18 @@ export function HomeScreen({ navigation }: any) {
         
         <TouchableOpacity
           style={themed($secondaryButton)}
-          onPress={() => navigation.navigate("ItemEditor", {})}
+          onPress={() => navigation.navigate("NewItemCameraScan")}
         >
-          <Text style={themed($secondaryButtonText)}>+ Add Item</Text>
+          <Text style={themed($secondaryButtonText)}>📷 Scan Item</Text>
         </TouchableOpacity>
       </View>
+
+      <TouchableOpacity
+        style={themed($secondaryButton)}
+        onPress={() => navigation.navigate("ItemEditor", {})}
+      >
+        <Text style={themed($secondaryButtonText)}>+ Add Item Manually</Text>
+      </TouchableOpacity>
     </View>
   )
 }
