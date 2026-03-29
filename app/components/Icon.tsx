@@ -110,6 +110,7 @@ export function Icon(props: IconProps) {
 }
 
 export const iconRegistry = {
+  add: require("@assets/icons/plus.png"),
   back: require("@assets/icons/back.png"),
   bell: require("@assets/icons/bell.png"),
   caretLeft: require("@assets/icons/caretLeft.png"),
@@ -119,6 +120,7 @@ export const iconRegistry = {
   community: require("@assets/icons/demo/community.png"),
   components: require("@assets/icons/demo/components.png"),
   debug: require("@assets/icons/demo/debug.png"),
+  filter: require("@assets/icons/filter.png"),
   github: require("@assets/icons/demo/github.png"),
   heart: require("@assets/icons/demo/heart.png"),
   hidden: require("@assets/icons/hidden.png"),
@@ -128,6 +130,7 @@ export const iconRegistry = {
   more: require("@assets/icons/more.png"),
   pin: require("@assets/icons/demo/pin.png"),
   podcast: require("@assets/icons/demo/podcast.png"),
+  search: require("@assets/icons/search.png"),
   settings: require("@assets/icons/settings.png"),
   slack: require("@assets/icons/demo/slack.png"),
   view: require("@assets/icons/view.png"),
