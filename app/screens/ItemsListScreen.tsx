@@ -155,8 +155,7 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
   }
 
   return (
-    <Screen preset="fixed" contentContainerStyle={[$styles.flex1, $containerInsets]}>
-      {/* Scrollable content area */}
+    <View style={themed($rootContainer)}>
       <View style={themed($contentArea)}>
         <View style={themed($header)}>
           <Text preset="heading">My Items</Text>
@@ -203,13 +202,18 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
         {renderLeftIcons()}
         {renderRightIcons()}
       </View>
-    </Screen>
+    </View>
   )
 }
 
+const $rootContainer: ThemedStyle<ViewStyle> = ({ colors }) => ({
+  flex: 1,
+  backgroundColor: colors.background,
+})
+
 const $contentArea: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   flex: 1,
-  paddingBottom: spacing.md,
+  paddingBottom: 80, // space for absolute positioned bottom nav
 })
 
 const $header: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
@@ -273,16 +277,16 @@ const $searchInput: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
 })
 
 const $bottomNav: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
-  // position: "absolute",
-  bottom: 0,
+  position: "absolute",
+  bottom: spacing.lg,
   left: 0,
   right: 0,
   flexDirection: "row",
   justifyContent: "space-between",
   alignItems: "center",
   paddingHorizontal: spacing.xl,
-  paddingVertical: spacing.lg,
-  backgroundColor: "red", // DEBUG - bright red to see if it renders
+  paddingVertical: spacing.md,
+  backgroundColor: colors.background,
 })
 
 const $navSideInner: ThemedStyle<ViewStyle> = ({ spacing }) => ({
