@@ -117,11 +117,9 @@ export function ItemEditorScreen({ navigation, route }: Props) {
   }, [itemId])
 
   const loadItem = async (id: string) => {
-    console.log("loadItem", id)
     try {
       const item = await getItem(id)
       if (item) {
-        console.log("loadItem data:", JSON.stringify(item))
         setName(item.name)
         setDescription(item.description || "")
         setLocation(item.location || "")
@@ -185,7 +183,6 @@ export function ItemEditorScreen({ navigation, route }: Props) {
       setNewPropValue("")
       setNewPropUnit("")
       // Trigger save after adding property
-      console.log("addProperty, triggering save", { autosave, isEditing, isSaving })
       if (autosave && isEditing && !isSaving) {
         handleSaveInternal()
       }
@@ -198,7 +195,6 @@ export function ItemEditorScreen({ navigation, route }: Props) {
 
   // Internal save function used by autosave and manual save
   const handleSaveInternal = async (skipReload = false) => {
-    console.log("handleSaveInternal", { nameRef: nameRef.current, locRef: locationRef.current, descRef: descriptionRef.current, nameVal: name, descVal: description, locVal: location, isEditing, itemId, name, description, location, tags, properties })
     if (!name.trim()) {
       if (!autosave) {
         Alert.alert("Error", "Please enter an item name")
@@ -209,7 +205,6 @@ export function ItemEditorScreen({ navigation, route }: Props) {
     setIsSaving(true)
     try {
       if (isEditing && itemId) {
-        console.log("updateItem called with", { name }); console.log("!!! UPDATE CALL, name:", name); await updateItem(itemId, {
           name: nameRef.current || name,
           description: descriptionRef.current || description,
           location: locationRef.current || location,

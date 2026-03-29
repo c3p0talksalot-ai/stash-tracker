@@ -121,7 +121,6 @@ export async function updateItem(id: string, input: Partial<ItemInput>): Promise
     
     await database.write(async () => {
       await item.update((record) => {
-        console.log("WatermelonDB update, input.name:", input.name)
         if (input.name !== undefined) record.name = input.name
         if (input.description !== undefined) record.description = input.description
         if (input.location !== undefined) record.location = input.location
