@@ -13,6 +13,7 @@ export default class Tag extends Model {
   @field('slug') slug!: string;
   @field('color') color?: string;
   @field('usage_count') usageCount!: number;
+  @field('is_preseeded') isPreseeded!: boolean;
   @date('created_at') createdAt!: Date;
   @date('updated_at') updatedAt!: Date;
 
