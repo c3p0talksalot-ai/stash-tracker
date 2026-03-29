@@ -7,7 +7,7 @@ import { useSettings } from "@/context/SettingsContext"
 import { useAppTheme } from "@/theme/context"
 
 export interface ThumbMenuAction {
-  icon: IconTypes
+  icon: IconTypes | string
   label: string
   onPress: () => void
 }
@@ -45,7 +45,7 @@ export const ThumbMenu: React.FC<ThumbMenuProps> = ({ actions, style }) => {
             styles.menuContainer,
             {
               [isLeftHanded ? "right" : "left"]: 56,
-              backgroundColor: theme.colors.surface,
+              backgroundColor: theme.colors.backgroundCard,
               borderColor: theme.colors.border,
             },
           ]}
@@ -57,11 +57,16 @@ export const ThumbMenu: React.FC<ThumbMenuProps> = ({ actions, style }) => {
               onPress={() => handlePress(action)}
               activeOpacity={0.7}
             >
-              <Icon
-                icon={action.icon}
-                size={24}
-                color={theme.colors.text}
-              />
+              {/* Use icon if valid, otherwise render emoji/character */}
+              {(action.icon === "add" || action.icon === "search" || action.icon === "settings" || action.icon === "filter" || action.icon === "back" || action.icon === "bell" || action.icon === "caretLeft" || action.icon === "caretRight" || action.icon === "check" || action.icon === "hidden" || action.icon === "lock" || action.icon === "menu" || action.icon === "more" || action.icon === "view" || action.icon === "x") ? (
+                <Icon
+                  icon={action.icon as any}
+                  size={24}
+                  color={theme.colors.text}
+                />
+              ) : (
+                <Text size="lg">{action.icon}</Text>
+              )}
               <Text
                 size="xs"
                 style={[

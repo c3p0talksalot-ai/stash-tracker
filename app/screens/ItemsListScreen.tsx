@@ -5,6 +5,7 @@ import { useFocusEffect } from "@react-navigation/native"
 import { Icon, PressableIcon } from "@/components/Icon"
 import { Screen } from "@/components/Screen"
 import { Text } from "@/components/Text"
+import { ThumbMenu } from "@/components/ThumbMenu"
 import { useSettings } from "@/context/SettingsContext"
 import type { AppStackScreenProps } from "@/navigators/navigationTypes"
 import { useAppTheme } from "@/theme/context"
@@ -97,6 +98,22 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
   const handleSettings = () => {
     navigation.navigate("Settings")
   }
+
+  const handleSearch = () => {
+    handleSearchToggle()
+  }
+
+  const handleFilter = () => {
+    Alert.alert("Filter", "Filter options coming soon")
+  }
+
+  // Thumb menu actions
+  const thumbMenuActions = [
+    { icon: "add", label: "Add Item", onPress: handleAddNew },
+    { icon: "search", label: "Search", onPress: handleSearch },
+    { icon: "settings", label: "Settings", onPress: handleSettings },
+    { icon: "filter", label: "Filter/Sort", onPress: handleFilter },
+  ]
 
   const renderItem = ({ item }: { item: ItemData }) => (
     <TouchableOpacity
@@ -231,6 +248,9 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
           }
         />
       </View>
+
+      {/* Thumb Menu - handedness aware */}
+      <ThumbMenu actions={thumbMenuActions} />
 
       {/* Bottom Navigation Bar - vertical sidebar based on handedness */}
       <View style={[
