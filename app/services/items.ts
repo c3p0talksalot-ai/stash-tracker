@@ -127,6 +127,38 @@ export async function updateItem(id: string, input: Partial<ItemInput>): Promise
         if (input.purchaseDate !== undefined) record.purchaseDate = input.purchaseDate
         if (input.purchasePrice !== undefined) record.purchasePrice = input.purchasePrice
       })
+      
+      // Update properties: delete existing and create new
+      if (input.properties !== undefined) {
+        const propsCollection = database.get<Property>("properties")
+        const existingProps = await propsCollection.query(Q.where("item_id", id)).fetch()
+        for (const prop of existingProps) {
+          await prop.destroyPermanently()
+        }
+        for (const prop of input.properties) {
+          await propsCollection.create((p) => {
+            p.itemId = id
+            p.key = prop.key
+            p.value = prop.value
+            p.unit = prop.unit || ""
+          })
+        }
+      }
+      
+      // Update tags: delete existing and create new
+      if (input.tags !== undefined) {
+        const itemTagsCollection = database.get<ItemTag>("item_tags")
+        const existingTags = await itemTagsCollection.query(Q.where("item_id", id)).fetch()
+        for (const tag of existingTags) {
+          await tag.destroyPermanently()
+        }
+        for (const tagId of input.tags) {
+          await itemTagsCollection.create((it) => {
+            it.itemId = id
+            it.tagId = tagId
+          })
+        }
+      }
     })
     
     return itemToOutput(item)
