@@ -127,6 +127,10 @@ export function ItemEditorScreen({ navigation, route }: Props) {
         setLocation(item.location || "")
         setTags(item.tags)
         setProperties(item.properties)
+        // Sync refs with loaded data
+        nameRef.current = item.name
+        descriptionRef.current = item.description || ""
+        locationRef.current = item.location || ""
         // Store original data hash
         originalItemData.current = JSON.stringify({
           name: item.name,
@@ -335,6 +339,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
             style={themed($input)}
             value={name}
             onChangeText={(text) => { setName(text); nameRef.current = text; clearTimeout(debounceTimer.current); debounceTimer.current = setTimeout(() => { if (autosave && hasUnsavedChanges && !isSaving) handleSaveInternal() }, 1500) } }
+            onBlur={handleBlur}
             placeholder="Enter item name"
             placeholderTextColor={colors.textDim}
             onEndEditing={handleBlur}
@@ -350,6 +355,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
             onChangeText={(text) => { setLocation(text); locationRef.current = text; clearTimeout(debounceTimer.current); debounceTimer.current = setTimeout(() => { if (autosave && hasUnsavedChanges && !isSaving) handleSaveInternal() }, 1500) } }
             placeholder="e.g., Garage, Closet"
             placeholderTextColor={colors.textDim}
+            onBlur={handleBlur}
             onEndEditing={handleBlur}
             onSubmitEditing={handleBlur}
           />
@@ -364,6 +370,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
             placeholder="Enter description"
             placeholderTextColor={colors.textDim}
             multiline
+            onBlur={handleBlur}
             onEndEditing={handleBlur}
             onSubmitEditing={handleBlur}
           />
