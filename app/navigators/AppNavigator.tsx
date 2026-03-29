@@ -14,6 +14,7 @@ import { ItemsListScreen } from "@/screens/ItemsListScreen"
 import { ItemDetailScreen } from "@/screens/ItemDetailScreen"
 import { ItemEditorScreen } from "@/screens/ItemEditorScreen"
 import { LoginScreen } from "@/screens/LoginScreen"
+import { NewItemCameraScanScreen } from "@/screens/NewItemCameraScanScreen"
 import { SettingsScreen } from "@/screens/SettingsScreen"
 import { WelcomeScreen } from "@/screens/WelcomeScreen"
 import { useAppTheme } from "@/theme/context"
@@ -63,6 +64,7 @@ const AppStack = () => {
           <Stack.Screen name="ItemDetail" component={ItemDetailScreen} />
           <Stack.Screen name="ItemEditor" component={ItemEditorScreen} />
           <Stack.Screen name="Settings" component={SettingsScreen} />
+          <Stack.Screen name="NewItemCameraScan" component={NewItemCameraScanScreen} />
           <Stack.Screen name="Demo" component={DemoNavigator} />
         </>
       )}

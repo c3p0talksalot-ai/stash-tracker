@@ -50,8 +50,8 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
   }
 
   const handleAddNew = () => {
-    // TODO: Implement camera flow - ticket #35
-    console.log("Add new pressed")
+    // Navigate to camera flow - NewItemCameraScan screen
+    navigation.navigate("NewItemCameraScan")
   }
 
   const handleSettings = () => {
@@ -159,26 +159,6 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
       <View style={themed($contentArea)}>
         <View style={themed($header)}>
           <Text preset="heading">My Items</Text>
-          {isSearchActive ? (
-            <TextInput
-              ref={searchInputRef}
-              style={themed($headerSearchInput)}
-              placeholder="Search..."
-              placeholderTextColor={colors.text}
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              onBlur={() => !searchQuery && setIsSearchActive(false)}
-              autoFocus
-            />
-          ) : (
-            <PressableIcon
-              icon="view"
-              color={theme.colors.text}
-              size={24}
-              containerStyle={themed($searchIcon)}
-              onPress={handleSearchToggle}
-            />
-          )}
         </View>
 
         <FlatList
