@@ -24,10 +24,6 @@ export type AppStackParamList = {
   ItemDetail: { itemId: string }
   ItemEditor: { itemId?: string }
   Demo: NavigatorScreenParams<DemoTabParamList>
-  // Inventory screens
-  ItemsList: undefined
-  ItemDetail: { itemId: string }
-  ItemEditor: { itemId?: string }
   // Camera & Gallery screens
   NewItemCameraScan: undefined
   GalleryPicker: { mode: "single" | "multi" }
