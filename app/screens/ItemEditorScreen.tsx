@@ -44,6 +44,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
   const [menuVisible, setMenuVisible] = useState(false)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const lastSaveTime = useRef(0)
   
   const isInitialLoad = useRef(true)
   const originalItemData = useRef<string>("")
@@ -63,9 +64,16 @@ export function ItemEditorScreen({ navigation, route }: Props) {
 
   // Save on blur - no debounce, save immediately when field loses focus
   const handleBlur = useCallback(() => {
-    console.log("handleBlur called", { autosave, hasUnsavedChanges, isSaving, isEditing, isInitialLoad: isInitialLoad.current })
+    // Debounce: prevent saves within 1 second of each other
+    const now = Date.now()
+    if (now - lastSaveTime.current < 1000) {
+      console.log("handleBlur blocked - too soon after last save")
+      return
+    }
+    console.log("handleBlur called", { autosave, hasUnsavedChanges, isSaving, isEditing, isInitialLoad: isInitialLoad.current, timeSinceLastSave: now - lastSaveTime.current })
     if (autosave && hasUnsavedChanges && !isSaving && isEditing && !isInitialLoad.current) {
       console.log("-> calling handleSaveInternal")
+      lastSaveTime.current = now
       handleSaveInternal()
     }
   }, [autosave, hasUnsavedChanges, isSaving, isEditing])
