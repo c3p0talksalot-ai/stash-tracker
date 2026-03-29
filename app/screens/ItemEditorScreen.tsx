@@ -156,7 +156,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
 
   const addTag = (tag: string) => {
     if (tag && !tags.includes(tag)) {
-      setTags([...tags, tag])
+      setTags(prev => [...prev, tag])
     }
     setNewTag("")
   }
@@ -167,7 +167,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
 
   const addProperty = () => {
     if (newPropKey && newPropValue) {
-      setProperties([...properties, { key: newPropKey, value: newPropValue, unit: newPropUnit || undefined }])
+      setProperties(prev => [...prev, { key: newPropKey, value: newPropValue, unit: newPropUnit || undefined }])
       setNewPropKey("")
       setNewPropValue("")
       setNewPropUnit("")
