@@ -197,8 +197,11 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
         />
       </View>
 
-      {/* Bottom Navigation Bar */}
-      <View style={themed($bottomNav)}>
+      {/* Bottom Navigation Bar - vertical sidebar based on handedness */}
+      <View style={[
+        themed($bottomNav),
+        isLeftHanded ? { left: 0, right: undefined } : { right: 0, left: undefined }
+      ]}>
         {renderLeftIcons()}
         {renderRightIcons()}
       </View>
@@ -278,21 +281,21 @@ const $searchInput: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
 
 const $bottomNav: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   position: "absolute",
-  bottom: 0,
-  left: 0,
   right: 0,
-  height: 80,
-  flexDirection: "row",
-  justifyContent: "space-between",
+  top: 100, // Start below header for easy thumb reach
+  bottom: 100, // End above soft buttons
+  width: 64,
+  flexDirection: "column",
+  justifyContent: "flex-start",
   alignItems: "center",
-  paddingHorizontal: spacing.xl,
-  paddingVertical: spacing.md,
-  backgroundColor: "cyan",
+  paddingVertical: spacing.lg,
+  gap: spacing.md,
+  backgroundColor: colors.background,
   zIndex: 999,
 })
 
 const $navSideInner: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  flexDirection: "row",
+  flexDirection: "column",
   alignItems: "center",
   gap: spacing.md,
 })
