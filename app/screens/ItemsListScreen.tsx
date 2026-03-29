@@ -1,5 +1,6 @@
-import { FC, useState, useRef } from "react"
-import { FlatList, TextInput, TextStyle, View, ViewStyle } from "react-native"
+import { FC, useState, useRef, useCallback } from "react"
+import { FlatList, TextInput, TextStyle, View, ViewStyle, TouchableOpacity, Alert } from "react-native"
+import { useFocusEffect } from "@react-navigation/native"
 
 import { PressableIcon } from "@/components/Icon"
 import { Screen } from "@/components/Screen"
@@ -10,27 +11,26 @@ import { useAppTheme } from "@/theme/context"
 import { $styles } from "@/theme/styles"
 import type { ThemedStyle } from "@/theme/types"
 import { useSafeAreaInsetsStyle } from "@/utils/useSafeAreaInsetsStyle"
+import { getAllItems, deleteItem, searchItems } from "@/services/items"
 
 interface ItemsListScreenProps extends AppStackScreenProps<"ItemsList"> {}
 
-// TODO: Replace with actual data from WatermelonDB
 interface ItemData {
   id: string
   name: string
   description?: string
-  thumbnailUri?: string
+  location?: string
+  tags: string[]
+  properties: { key: string; value: string; unit?: string }[]
+  createdAt: number
 }
-
-const MOCK_ITEMS: ItemData[] = [
-  { id: "1", name: "Sample Item 1", description: "Description here" },
-  { id: "2", name: "Sample Item 2", description: "Description here" },
-]
 
 export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
   const { themed, theme } = useAppTheme()
   const { colors } = theme
   const { handedness } = useSettings()
-  const [items] = useState<ItemData[]>(MOCK_ITEMS)
+  const [items, setItems] = useState<ItemData[]>([])
+  const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [isSearchActive, setIsSearchActive] = useState(false)
   const searchInputRef = useRef<TextInput>(null)
@@ -38,6 +38,42 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
   const $containerInsets = useSafeAreaInsetsStyle(["bottom"])
 
   const isLeftHanded = handedness === "left"
+
+  const loadItems = useCallback(async () => {
+    try {
+      setLoading(true)
+      const loadedItems = searchQuery ? await searchItems(searchQuery) : await getAllItems()
+      setItems(loadedItems)
+    } catch (error) {
+      console.error("Failed to load items:", error)
+    } finally {
+      setLoading(false)
+    }
+  }, [searchQuery])
+
+  useFocusEffect(
+    useCallback(() => {
+      loadItems()
+    }, [loadItems])
+  )
+
+  const handleItemPress = (itemId: string) => {
+    navigation.navigate("ItemDetail", { itemId })
+  }
+
+  const handleDeleteItem = (item: ItemData) => {
+    Alert.alert("Delete Item", `Are you sure you want to delete "${item.name}"?`, [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: async () => {
+          await deleteItem(item.id)
+          loadItems()
+        },
+      },
+    ])
+  }
 
   const handleSearchToggle = () => {
     if (!isSearchActive) {
@@ -59,14 +95,19 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
   }
 
   const renderItem = ({ item }: { item: ItemData }) => (
-    <View style={themed($itemCard)}>
+    <TouchableOpacity
+      style={themed($itemCard)}
+      onPress={() => handleItemPress(item.id)}
+      onLongPress={() => handleDeleteItem(item)}
+    >
       <Text preset="heading">{item.name}</Text>
       {item.description && (
         <Text size="sm" style={themed($itemDesc)}>
           {item.description}
         </Text>
       )}
-    </View>
+      {item.location && <Text size="sm">📍 {item.location}</Text>}
+    </TouchableOpacity>
   )
 
   const renderSearchInput = () => (
