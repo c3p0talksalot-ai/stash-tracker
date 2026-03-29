@@ -114,10 +114,11 @@ export function ItemEditorScreen({ navigation, route }: Props) {
   }, [itemId])
 
   const loadItem = async (id: string) => {
-    console.log("loadItem", id, JSON.stringify(item))
+    console.log("loadItem", id)
     try {
       const item = await getItem(id)
       if (item) {
+        console.log("loadItem data:", JSON.stringify(item))
         setName(item.name)
         setDescription(item.description || "")
         setLocation(item.location || "")
