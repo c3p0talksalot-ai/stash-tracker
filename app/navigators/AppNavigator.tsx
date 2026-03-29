@@ -10,7 +10,9 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import Config from "@/config"
 import { useAuth } from "@/context/AuthContext"
 import { ErrorBoundary } from "@/screens/ErrorScreen/ErrorBoundary"
+import { ItemsListScreen } from "@/screens/ItemsListScreen"
 import { LoginScreen } from "@/screens/LoginScreen"
+import { SettingsScreen } from "@/screens/SettingsScreen"
 import { WelcomeScreen } from "@/screens/WelcomeScreen"
 import { useAppTheme } from "@/theme/context"
 
@@ -34,6 +36,9 @@ const AppStack = () => {
     theme: { colors },
   } = useAppTheme()
 
+  // Skip auth flow for now - go straight to items list
+  const showAuthFlow = false
+
   return (
     <Stack.Navigator
       screenOptions={{
@@ -43,17 +48,18 @@ const AppStack = () => {
           backgroundColor: colors.background,
         },
       }}
-      initialRouteName={isAuthenticated ? "Welcome" : "Login"}
+      initialRouteName="ItemsList"
     >
-      {isAuthenticated ? (
+      {showAuthFlow && !isAuthenticated ? (
         <>
-          <Stack.Screen name="Welcome" component={WelcomeScreen} />
-
-          <Stack.Screen name="Demo" component={DemoNavigator} />
+          <Stack.Screen name="Login" component={LoginScreen} />
         </>
       ) : (
         <>
-          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="Welcome" component={WelcomeScreen} />
+          <Stack.Screen name="ItemsList" component={ItemsListScreen} />
+          <Stack.Screen name="Settings" component={SettingsScreen} />
+          <Stack.Screen name="Demo" component={DemoNavigator} />
         </>
       )}
 
