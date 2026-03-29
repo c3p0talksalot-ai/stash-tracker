@@ -91,4 +91,8 @@ export const colors = {
   warningBackground: palette.warning100,
   info: palette.info500,
   infoBackground: palette.info100,
+
+  // Aliases for components expecting these names
+  card: palette.neutral100,
+  primary: palette.primary500,
 } as const

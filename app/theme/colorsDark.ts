@@ -5,52 +5,54 @@
  */
 const palette = {
   // Neutrals - high contrast dark theme
-  neutral000: "#000000",
-  neutral100: "#121212", // Main background
-  neutral200: "#1E1E1E", // Card background
-  neutral300: "#2D2D2D", // Elevated surfaces
-  neutral400: "#404040", // Borders
-  neutral500: "#525252",
-  neutral600: "#6B6B6B",
-  neutral700: "#8C8C8C",
-  neutral800: "#CECECE", // Secondary text
-  neutral900: "#F5F5F5", // Primary text - nearly white
+  neutral000: "#1A1A1A", // Primary text - nearly white on dark
+  neutral100: "#2D2D2D",
+  neutral200: "#3D3D3D", // Card background
+  neutral300: "#4A4A4A",
+  neutral400: "#5C5C5C",
+  neutral500: "#707070",
+  neutral600: "#8C8C8C",
+  neutral700: "#ADADAD",
+  neutral800: "#CECECE",
+  neutral900: "#F5F5F5", // Main background - near white
 
-  // Primary - warm terracotta (lighter for dark bg, maintains hue)
-  primary100: "#F5C4B0",
-  primary200: "#E89A85",
-  primary300: "#D97A65",
-  primary400: "#C45C47",
-  primary500: "#E87D67", // Main primary - lighter for dark bg visibility
-  primary600: "#C45C47",
+  // Primary - warm terracotta (lighter for dark bg visibility)
+  primary100: "#8B3A2F",
+  primary200: "#A64B3A",
+  primary300: "#C45C47",
+  primary400: "#D97A65", // Main primary on dark
+  primary500: "#E89A85",
+  primary600: "#F5C4B0",
 
   // Secondary - slate blue (lighter for dark bg)
-  secondary100: "#B3C5E0",
-  secondary200: "#8BA3CA",
-  secondary300: "#6B82AD",
-  secondary400: "#8BA3CA",
-  secondary500: "#A8BDD9", // Main secondary - lighter for dark bg
+  secondary100: "#2E3A5C",
+  secondary200: "#3D4D73",
+  secondary300: "#4E6090",
+  secondary400: "#6B82AD",
+  secondary500: "#8BA3CA",
+  secondary600: "#B3C5E0",
 
   // Accent - golden yellow (lighter for dark bg)
-  accent100: "#FFF0C9",
-  accent200: "#FFE299",
-  accent300: "#F5D56E",
-  accent400: "#EBC344",
-  accent500: "#FFD54F", // Main accent - lighter for dark bg
+  accent100: "#B8860B",
+  accent200: "#DAA520",
+  accent300: "#EBC344",
+  accent400: "#F5D56E",
+  accent500: "#FFE299",
+  accent600: "#FFF0C9",
 
-  // Semantic - using blue (color-blind friendly vs red)
+  // Semantic - lighter versions for dark background
   info500: "#60A5FA",
   info100: "#1E3A5F",
-  success500: "#34D399", // Green - also used with checkmark icon
+  success500: "#34D399",
   success100: "#064E3B",
   warning500: "#FBBF24",
-  warning100: "#451A03",
-  error500: "#F87171", // Red - lighter for dark bg, also used with X icon
-  error100: "#450A0A",
+  warning100: "#78350F",
+  error500: "#F87171",
+  error100: "#7F1D1D",
 
   // Overlay
-  overlay20: "rgba(255, 255, 255, 0.08)",
-  overlay50: "rgba(255, 255, 255, 0.24)",
+  overlay20: "rgba(0, 0, 0, 0.2)",
+  overlay50: "rgba(0, 0, 0, 0.5)",
 } as const
 
 export const colors = {
@@ -59,22 +61,22 @@ export const colors = {
 
   // Text - high contrast on dark background
   text: palette.neutral900,
-  textDim: palette.neutral700,
+  textDim: palette.neutral600,
   textInverse: palette.neutral000,
 
   // Backgrounds
-  background: palette.neutral100,
-  backgroundSecondary: palette.neutral200,
+  background: palette.neutral000,
+  backgroundSecondary: palette.neutral100,
   backgroundCard: palette.neutral200,
-  backgroundElevated: palette.neutral300,
+  backgroundElevated: palette.neutral100,
 
   // Borders
-  border: palette.neutral400,
-  borderFocused: palette.primary500,
+  border: palette.neutral300,
+  borderFocused: palette.primary400,
 
   // Interactive
-  tint: palette.primary500,
-  tintPressed: palette.primary400,
+  tint: palette.primary400,
+  tintPressed: palette.primary300,
   tintInactive: palette.neutral500,
 
   // Separators
@@ -89,4 +91,8 @@ export const colors = {
   warningBackground: palette.warning100,
   info: palette.info500,
   infoBackground: palette.info100,
+
+  // Aliases for components expecting these names
+  card: palette.neutral200,
+  primary: palette.primary400,
 } as const
