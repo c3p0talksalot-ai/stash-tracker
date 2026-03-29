@@ -45,6 +45,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const lastSaveTime = useRef(0)
+  const debounceTimer = useRef<NodeJS.Timeout | null>(null)
   const nameRef = useRef("")
   const locationRef = useRef("")
   const descriptionRef = useRef("")
@@ -333,10 +334,11 @@ export function ItemEditorScreen({ navigation, route }: Props) {
           <TextInput
             style={themed($input)}
             value={name}
-            onChangeText={(text) => { setName(text); nameRef.current = text }}
+            onChangeText={(text) => { setName(text); nameRef.current = text; clearTimeout(debounceTimer.current); debounceTimer.current = setTimeout(() => { if (autosave && hasUnsavedChanges && !isSaving) handleSaveInternal() }, 1500) } }
             placeholder="Enter item name"
             placeholderTextColor={colors.textDim}
-            onBlur={handleBlur}
+            onEndEditing={handleBlur}
+            onSubmitEditing={handleBlur}
           />
         </View>
 
@@ -345,10 +347,11 @@ export function ItemEditorScreen({ navigation, route }: Props) {
           <TextInput
             style={themed($input)}
             value={location}
-            onChangeText={(text) => { setLocation(text); locationRef.current = text }}
+            onChangeText={(text) => { setLocation(text); locationRef.current = text; clearTimeout(debounceTimer.current); debounceTimer.current = setTimeout(() => { if (autosave && hasUnsavedChanges && !isSaving) handleSaveInternal() }, 1500) } }
             placeholder="e.g., Garage, Closet"
             placeholderTextColor={colors.textDim}
-            onBlur={handleBlur}
+            onEndEditing={handleBlur}
+            onSubmitEditing={handleBlur}
           />
         </View>
 
@@ -357,11 +360,12 @@ export function ItemEditorScreen({ navigation, route }: Props) {
           <TextInput
             style={[themed($input), { minHeight: 80, textAlignVertical: "top" }]}
             value={description}
-            onChangeText={(text) => { setDescription(text); descriptionRef.current = text }}
+            onChangeText={(text) => { setDescription(text); descriptionRef.current = text; clearTimeout(debounceTimer.current); debounceTimer.current = setTimeout(() => { if (autosave && hasUnsavedChanges && !isSaving) handleSaveInternal() }, 1500) } }
             placeholder="Enter description"
             placeholderTextColor={colors.textDim}
             multiline
-            onBlur={handleBlur}
+            onEndEditing={handleBlur}
+            onSubmitEditing={handleBlur}
           />
         </View>
 
@@ -382,7 +386,8 @@ export function ItemEditorScreen({ navigation, route }: Props) {
                 placeholder="+"
                 placeholderTextColor={colors.textDim}
                 onSubmitEditing={() => { addTag(newTag); handleBlur(); }}
-                onBlur={handleBlur}
+                onEndEditing={handleBlur}
+            onSubmitEditing={handleBlur}
               />
             </View>
           </View>
