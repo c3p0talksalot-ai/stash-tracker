@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import {
   StyleSheet,
   View,
@@ -9,9 +9,12 @@ import {
   Alert,
   TextStyle,
   ViewStyle,
+  Modal,
+  Pressable,
 } from "react-native"
 import { useAppTheme } from "@/theme/context"
-import { getItem, createItem, updateItem } from "@/services/items"
+import { getItem, createItem, updateItem, deleteItem } from "@/services/items"
+import { Icon } from "@/components/Icon"
 import type { AppStackScreenProps } from "@/navigators/navigationTypes"
 import type { ThemedStyle } from "@/theme/types"
 
@@ -32,6 +35,8 @@ export function ItemEditorScreen({ navigation, route }: Props) {
   const [newPropValue, setNewPropValue] = useState("")
   const [newPropUnit, setNewPropUnit] = useState("")
   const [loading, setLoading] = useState(isEditing)
+  const [menuVisible, setMenuVisible] = useState(false)
+  const menuButtonRef = useRef<TouchableOpacity>(null)
 
   useEffect(() => {
     if (itemId) {
@@ -113,6 +118,32 @@ export function ItemEditorScreen({ navigation, route }: Props) {
       console.error("Failed to save item:", e)
       Alert.alert("Error", "Failed to save item")
     }
+  }
+
+  const handleDelete = () => {
+    setMenuVisible(false)
+    Alert.alert("Delete Item", `Are you sure you want to delete this item?`, [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: async () => {
+          if (itemId) {
+            await deleteItem(itemId)
+          }
+          navigation.goBack()
+        },
+      },
+    ])
+  }
+
+  const handleEdit = () => {
+    setMenuVisible(false)
+    // Already in edit mode, no action needed
+  }
+
+  const toggleMenu = () => {
+    setMenuVisible(!menuVisible)
   }
 
   return (

@@ -1,5 +1,5 @@
 import { FC, useState, useRef, useCallback } from "react"
-import { FlatList, TextInput, TextStyle, View, ViewStyle, TouchableOpacity, Alert } from "react-native"
+import { FlatList, TextInput, TextStyle, View, ViewStyle, TouchableOpacity, Alert, ActionSheetIOS } from "react-native"
 import { useFocusEffect } from "@react-navigation/native"
 
 import { Icon, PressableIcon } from "@/components/Icon"
@@ -86,9 +86,25 @@ export const ItemsListScreen: FC<ItemsListScreenProps> = ({ navigation }) => {
   }
 
   const handleAddNew = () => {
-    console.log("Add new pressed, navigating to NewItemCameraScan")
-    // Navigate to camera flow - NewItemCameraScan screen
-    navigation.navigate("NewItemCameraScan")
+    ActionSheetIOS.showActionSheetWithOptions(
+      {
+        options: ["Cancel", "Camera", "Gallery", "Manual Entry"],
+        cancelButtonIndex: 0,
+      },
+      (buttonIndex) => {
+        switch (buttonIndex) {
+          case 1:
+            navigation.navigate("NewItemCameraScan")
+            break
+          case 2:
+            navigation.navigate("GalleryPicker", { mode: "single" })
+            break
+          case 3:
+            navigation.navigate("ItemEditor", {})
+            break
+        }
+      }
+    )
   }
 
   const handleSettings = () => {
