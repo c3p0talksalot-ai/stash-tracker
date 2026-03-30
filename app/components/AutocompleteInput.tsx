@@ -1,14 +1,16 @@
-import { useState, useCallback, useMemo } from "react"
+import { useState, useMemo } from "react"
 import {
   View,
   Text,
   TextInput,
   StyleSheet,
+  FlatList,
+  TouchableOpacity,
   useWindowDimensions,
   ViewStyle,
   TextStyle,
+  Keyboard,
 } from "react-native"
-import AutocompleteTags, { AutocompleteTag } from "react-native-autocomplete-tags"
 import { useAppTheme } from "@/theme/context"
 
 export interface AutocompleteOption {
@@ -27,8 +29,8 @@ interface AutocompleteInputProps {
   disabled?: boolean
   onBlur?: () => void
   onSubmitEditing?: () => void
-  multiline?: boolean
   autoCapitalize?: "none" | "sentences" | "words" | "characters"
+  inputStyle?: ViewStyle
 }
 
 export function AutocompleteInput({
@@ -42,12 +44,13 @@ export function AutocompleteInput({
   disabled = false,
   onBlur,
   onSubmitEditing,
-  multiline = false,
   autoCapitalize = "sentences",
+  inputStyle,
 }: AutocompleteInputProps) {
   const { theme } = useAppTheme()
   const { colors } = theme
   const { width } = useWindowDimensions()
+  const [isFocused, setIsFocused] = useState(false)
 
   // Determine number of columns based on screen width
   const numColumns = useMemo(() => {
@@ -58,106 +61,83 @@ export function AutocompleteInput({
 
   // Filter suggestions based on input
   const filteredSuggestions = useMemo(() => {
-    if (!value.trim()) return suggestions
+    if (!value.trim()) return suggestions.slice(0, 10)
     const lowerValue = value.toLowerCase()
-    return suggestions.filter((s) =>
-      s.label.toLowerCase().includes(lowerValue)
-    )
+    return suggestions
+      .filter((s) => s.label.toLowerCase().includes(lowerValue))
+      .slice(0, 10)
   }, [value, suggestions])
 
-  // Convert to AutocompleteTag format
-  const tags: AutocompleteTag[] = useMemo(() => {
-    if (!value.trim()) return []
-    // Only show as tag if exact match exists in suggestions
-    const exactMatch = suggestions.find(
-      (s) => s.label.toLowerCase() === value.toLowerCase()
-    )
-    if (exactMatch) {
-      return [{ id: exactMatch.id, text: exactMatch.label }]
+  const showSuggestions = isFocused && filteredSuggestions.length > 0
+
+  const handleSelect = (option: AutocompleteOption) => {
+    onChangeText(option.label)
+    if (onSelect) {
+      onSelect(option)
     }
-    return []
-  }, [value, suggestions])
-
-  const handleTagPress = useCallback(
-    (tag: AutocompleteTag) => {
-      // User selected a suggestion from autocomplete
-      onChangeText(tag.text)
-      if (onSelect) {
-        onSelect({ id: tag.id, label: tag.text })
-      }
-    },
-    [onChangeText, onSelect]
-  )
-
-  const handleTextChange = useCallback(
-    (text: string) => {
-      onChangeText(text)
-    },
-    [onChangeText]
-  )
-
-  const renderSuggestionItem = useCallback(
-    ({ item }: { item: AutocompleteOption }) => (
-      <View
-        style={[
-          styles.suggestionItem,
-          { backgroundColor: colors.backgroundCard },
-        ]}
-      >
-        <Text style={[styles.suggestionText, { color: colors.text }]}>
-          {item.label}
-        </Text>
-      </View>
-    ),
-    [colors]
-  )
+    setIsFocused(false)
+    Keyboard.dismiss()
+  }
 
   return (
     <View style={styles.container}>
       {label && (
         <Text style={[styles.label, { color: colors.text }]}>{label}</Text>
       )}
-      <AutocompleteTags
-        tags={tags}
-        inputValue={value}
-        onChangeText={handleTextChange}
-        onTagPress={handleTagPress}
-        suggestions={filteredSuggestions}
-        suggestionRowHeight={44}
-        flatListStyle={[
-          styles.flatListStyle,
-          { backgroundColor: colors.backgroundCard },
-          numColumns > 1 && { flexDirection: "row", flexWrap: "wrap" },
-        ]}
-        renderSuggestionItem={renderSuggestionItem}
-        inputStyles={[
+      <TextInput
+        style={[
           styles.input,
-          {
-            backgroundColor: colors.backgroundCard,
-            borderColor: colors.border,
-            color: colors.text,
-          },
-          multiline && { minHeight: 80, textAlignVertical: "top" as const },
+          { backgroundColor: colors.backgroundCard, borderColor: colors.border, color: colors.text },
+          isFocused && { borderColor: colors.primary },
+          inputStyle,
         ]}
-        tagContainerStyles={[
-          styles.tagContainer,
-          { backgroundColor: colors.tint },
-        ]}
-        tagTextStyles={[styles.tagText, { color: colors.textInverse }]}
-        removeTagIconColor={colors.textInverse}
-        placeholderTextColor={colors.textDim}
+        value={value}
+        onChangeText={onChangeText}
         placeholder={placeholder}
-        disabled={disabled}
+        placeholderTextColor={colors.textDim}
         autoCapitalize={autoCapitalize}
-        // Disable auto-add of tags - user must explicitly select
-        createTagOn={[]}
-        // Don't filter suggestions automatically - we handle it
-        disableAutoFilter={true}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => {
+          setIsFocused(false)
+          if (onBlur) onBlur()
+        }}
+        onSubmitEditing={onSubmitEditing}
+        editable={!disabled}
       />
+      {showSuggestions && (
+        <View
+          style={[
+            styles.suggestionsContainer,
+            { backgroundColor: colors.backgroundCard, borderColor: colors.border },
+            numColumns > 1 && { flexDirection: "row", flexWrap: "wrap" },
+          ]}
+        >
+          <FlatList
+            data={filteredSuggestions}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={[
+                  styles.suggestionItem,
+                  { borderBottomColor: colors.border },
+                  numColumns > 1 && { width: `${100 / numColumns}%` },
+                ]}
+                onPress={() => handleSelect(item)}
+              >
+                <Text style={[styles.suggestionText, { color: colors.text }]}>
+                  {item.label}
+                </Text>
+              </TouchableOpacity>
+            )}
+            keyboardShouldPersistTaps="handled"
+            style={styles.suggestionsList}
+          />
+        </View>
+      )}
       {hint && (
         <Text style={[styles.hint, { color: colors.textDim }]}>{hint}</Text>
       )}
-    }
+    </View>
   )
 }
 
@@ -176,17 +156,28 @@ const styles = StyleSheet.create({
     fontSize: 16,
     borderWidth: 1,
   } as ViewStyle & TextStyle,
-  flatListStyle: {
+  suggestionsContainer: {
+    position: "absolute",
+    top: "100%",
+    left: 0,
+    right: 0,
     marginTop: 4,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "transparent",
+    zIndex: 1000,
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    maxHeight: 200,
+  } as ViewStyle,
+  suggestionsList: {
     maxHeight: 200,
   } as ViewStyle,
   suggestionItem: {
     padding: 12,
     borderBottomWidth: 1,
-    borderBottomColor: "rgba(0,0,0,0.1)",
   } as ViewStyle,
   suggestionText: {
     fontSize: 14,
@@ -194,16 +185,5 @@ const styles = StyleSheet.create({
   hint: {
     fontSize: 12,
     marginTop: 4,
-  } as TextStyle,
-  tagContainer: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 16,
-    flexDirection: "row",
-    alignItems: "center",
-  } as ViewStyle,
-  tagText: {
-    fontSize: 14,
-    marginLeft: 4,
   } as TextStyle,
 })
