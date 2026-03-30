@@ -60,6 +60,7 @@
     "react-dom": "19.2.0",
     "react-i18next": "^15.0.1",
     "react-native": "0.83.2",
+    "react-native-autocomplete-tags": "^2.0.0",
     "react-native-drawer-layout": "^4.0.1",
     "react-native-edge-to-edge": "~1.6.1",
     "react-native-gesture-handler": "~2.30.0",
