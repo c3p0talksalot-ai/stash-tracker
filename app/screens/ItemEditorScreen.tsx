@@ -251,20 +251,6 @@ export function ItemEditorScreen({ navigation, route }: Props) {
         `You've entered a key "${key}" without a value or unit. What would you like to do?`,
         [
           { 
-            text: "Add Value", 
-            onPress: () => {
-              // Just close dialog - user can now add value
-              console.log("[addProperty] User chose Add Value")
-            }
-          },
-          { 
-            text: "Add Unit", 
-            onPress: () => {
-              // Just close dialog - user can now add unit
-              console.log("[addProperty] User chose Add Unit")
-            }
-          },
-          { 
             text: "Add as Tag", 
             onPress: () => {
               console.log("[addProperty] Adding key as tag:", key)
@@ -276,6 +262,20 @@ export function ItemEditorScreen({ navigation, route }: Props) {
               if (autosave && isEditing && !isSaving) {
                 handleSaveInternal()
               }
+            }
+          },
+          { 
+            text: "Add Value", 
+            onPress: () => {
+              // Just close dialog - user can now add value
+              console.log("[addProperty] User chose Add Value")
+            }
+          },
+          { 
+            text: "Add Unit", 
+            onPress: () => {
+              // Just close dialog - user can now add unit
+              console.log("[addProperty] User chose Add Unit")
             }
           },
           { text: "Cancel", style: "cancel" },
