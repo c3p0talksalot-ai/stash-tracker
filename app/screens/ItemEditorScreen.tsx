@@ -250,7 +250,6 @@ export function ItemEditorScreen({ navigation, route }: Props) {
         "Key Only",
         `You've entered a key "${key}" without a value. Do you want to add this key only?`,
         [
-          { text: "Cancel", style: "cancel" },
           { 
             text: "Add Key Only", 
             onPress: () => {
@@ -266,6 +265,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
               }
             }
           },
+          { text: "Cancel", style: "cancel" },
         ]
       )
     } else {
