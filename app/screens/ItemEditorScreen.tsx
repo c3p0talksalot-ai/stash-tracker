@@ -214,14 +214,12 @@ export function ItemEditorScreen({ navigation, route }: Props) {
     const value = newPropValue.trim()
     const unit = newPropUnit.trim()
 
-    // Clear inputs immediately to prevent stale state
-    setNewPropKey("")
-    setNewPropValue("")
-    setNewPropUnit("")
-
     // Key + Value or Key + Unit = save property
     if (key && (value || unit)) {
       setProperties(prev => [...prev, { key, value: value || "", unit: unit || undefined }])
+      setNewPropKey("")
+      setNewPropValue("")
+      setNewPropUnit("")
       // Trigger save after adding property
       if (autosave && isEditing && !isSaving) {
         handleSaveInternal()
@@ -237,6 +235,8 @@ export function ItemEditorScreen({ navigation, route }: Props) {
             text: "Add Key Only", 
             onPress: () => {
               setProperties(prev => [...prev, { key, value: "", unit: undefined }])
+              setNewPropKey("")
+              setNewPropUnit("")
               if (autosave && isEditing && !isSaving) {
                 handleSaveInternal()
               }
