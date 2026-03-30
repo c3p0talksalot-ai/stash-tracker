@@ -248,8 +248,22 @@ export function ItemEditorScreen({ navigation, route }: Props) {
       console.log("[addProperty] Showing key-only dialog for:", key)
       Alert.alert(
         "Key Only",
-        `You've entered a key "${key}" without a value. Do you want to add this key only?`,
+        `You've entered a key "${key}" without a value or unit. What would you like to do?`,
         [
+          { 
+            text: "Add Value", 
+            onPress: () => {
+              // Just close dialog - user can now add value
+              console.log("[addProperty] User chose Add Value")
+            }
+          },
+          { 
+            text: "Add Unit", 
+            onPress: () => {
+              // Just close dialog - user can now add unit
+              console.log("[addProperty] User chose Add Unit")
+            }
+          },
           { 
             text: "Add Key Only", 
             onPress: () => {
