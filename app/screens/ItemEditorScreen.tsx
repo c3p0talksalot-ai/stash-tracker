@@ -254,13 +254,12 @@ export function ItemEditorScreen({ navigation, route }: Props) {
             text: "Add as Tag", 
             onPress: () => {
               console.log("[addProperty] Adding key as tag:", key)
-              if (!tags.includes(key)) {
-                setTags(prev => [...prev, key])
-              }
+              const newTags = tags.includes(key) ? tags : [...tags, key]
+              setTags(newTags)
               setNewPropKey("")
               newPropKeyRef.current = ""
               if (autosave && isEditing && !isSaving) {
-                handleSaveInternal()
+                handleSaveInternal(newTags, [])
               }
             }
           },
@@ -291,8 +290,10 @@ export function ItemEditorScreen({ navigation, route }: Props) {
   }
 
   // Internal save function used by autosave and manual save
-  const handleSaveInternal = async (skipReload = false) => {
-    console.log("[handleSaveInternal] Called. isEditing:", isEditing, "itemId:", itemId, "tags:", tags, "properties:", properties)
+  const handleSaveInternal = async (skipReload = false, overrideTags?: string[], overrideProperties?: { key: string; value: string; unit?: string }[]) => {
+    const tagsToSave = overrideTags ?? tags
+    const propsToSave = overrideProperties ?? properties
+    console.log("[handleSaveInternal] Called. isEditing:", isEditing, "itemId:", itemId, "tags:", tagsToSave, "properties:", propsToSave)
     if (!name.trim()) {
       if (!autosave) {
         Alert.alert("Error", "Please enter an item name")
@@ -307,8 +308,8 @@ export function ItemEditorScreen({ navigation, route }: Props) {
           name: nameRef.current || name,
           description: descriptionRef.current || description,
           location: locationRef.current || location,
-          tags,
-          properties,
+          tags: tagsToSave,
+          properties: propsToSave,
         }
         console.log("[handleSaveInternal] Updating item:", itemId, updateData)
         await updateItem(itemId, updateData)
@@ -317,8 +318,8 @@ export function ItemEditorScreen({ navigation, route }: Props) {
           name: nameRef.current || name,
           description: descriptionRef.current || description,
           location: locationRef.current || location,
-          tags,
-          properties,
+          tags: tagsToSave,
+          properties: propsToSave,
         }
         console.log("[handleSaveInternal] Creating item:", createData)
         await createItem(createData)
