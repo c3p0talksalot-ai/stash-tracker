@@ -1,14 +1,14 @@
-import { useState, useCallback, useMemo } from "react"
+import { useCallback, useMemo, useEffect } from "react"
 import {
   View,
   Text,
-  TextInput,
   StyleSheet,
   useWindowDimensions,
   ViewStyle,
   TextStyle,
+  TouchableOpacity,
 } from "react-native"
-import AutocompleteTags, { AutocompleteTag } from "react-native-autocomplete-tags"
+import AutocompleteTags from "react-native-autocomplete-tags"
 import { useAppTheme } from "@/theme/context"
 
 export interface AutocompleteOption {
@@ -49,14 +49,12 @@ export function AutocompleteInput({
   const { colors } = theme
   const { width } = useWindowDimensions()
 
-  // Determine number of columns based on screen width
   const numColumns = useMemo(() => {
     if (width < 400) return 1
     if (width < 600) return 2
     return 3
   }, [width])
 
-  // Filter suggestions based on input
   const filteredSuggestions = useMemo(() => {
     if (!value.trim()) return suggestions
     const lowerValue = value.toLowerCase()
@@ -65,49 +63,26 @@ export function AutocompleteInput({
     )
   }, [value, suggestions])
 
-  // Convert to AutocompleteTag format
-  const tags: AutocompleteTag[] = useMemo(() => {
-    if (!value.trim()) return []
-    // Only show as tag if exact match exists in suggestions
-    const exactMatch = suggestions.find(
-      (s) => s.label.toLowerCase() === value.toLowerCase()
-    )
-    if (exactMatch) {
-      return [{ id: exactMatch.id, text: exactMatch.label }]
-    }
-    return []
-  }, [value, suggestions])
-
-  const handleTagPress = useCallback(
-    (tag: AutocompleteTag) => {
-      // User selected a suggestion from autocomplete
-      onChangeText(tag.text)
+  const handleSuggestionPress = useCallback(
+    (suggestion: AutocompleteOption) => {
+      onChangeText(suggestion.label)
       if (onSelect) {
-        onSelect({ id: tag.id, label: tag.text })
+        onSelect(suggestion)
       }
     },
     [onChangeText, onSelect]
   )
 
-  const handleTextChange = useCallback(
-    (text: string) => {
-      onChangeText(text)
-    },
-    [onChangeText]
-  )
-
-  const renderSuggestionItem = useCallback(
-    ({ item }: { item: AutocompleteOption }) => (
-      <View
-        style={[
-          styles.suggestionItem,
-          { backgroundColor: colors.backgroundCard },
-        ]}
+  const renderSuggestion = useCallback(
+    (suggestion: AutocompleteOption, onPress: (s: AutocompleteOption) => void) => (
+      <TouchableOpacity
+        style={[styles.suggestionItem, { backgroundColor: colors.backgroundCard }]}
+        onPress={() => onPress(suggestion)}
       >
         <Text style={[styles.suggestionText, { color: colors.text }]}>
-          {item.label}
+          {suggestion.label}
         </Text>
-      </View>
+      </TouchableOpacity>
     ),
     [colors]
   )
@@ -118,46 +93,49 @@ export function AutocompleteInput({
         <Text style={[styles.label, { color: colors.text }]}>{label}</Text>
       )}
       <AutocompleteTags
-        tags={tags}
-        inputValue={value}
-        onChangeText={handleTextChange}
-        onTagPress={handleTagPress}
+        tags={value.trim() ? [value] : []}
+        onChangeTags={() => {}}
+        labelExtractor={(tag: string) => tag}
         suggestions={filteredSuggestions}
-        suggestionRowHeight={44}
-        flatListStyle={[
-          styles.flatListStyle,
-          { backgroundColor: colors.backgroundCard },
-          numColumns > 1 && { flexDirection: "row", flexWrap: "wrap" },
-        ]}
-        renderSuggestionItem={renderSuggestionItem}
-        inputStyles={[
-          styles.input,
-          {
-            backgroundColor: colors.backgroundCard,
-            borderColor: colors.border,
-            color: colors.text,
-          },
-          multiline && { minHeight: 80, textAlignVertical: "top" as const },
-        ]}
-        tagContainerStyles={[
-          styles.tagContainer,
-          { backgroundColor: colors.tint },
-        ]}
-        tagTextStyles={[styles.tagText, { color: colors.textInverse }]}
-        removeTagIconColor={colors.textInverse}
-        placeholderTextColor={colors.textDim}
-        placeholder={placeholder}
-        disabled={disabled}
-        autoCapitalize={autoCapitalize}
-        // Disable auto-add of tags - user must explicitly select
-        createTagOn={[]}
-        // Don't filter suggestions automatically - we handle it
-        disableAutoFilter={true}
+        onSuggestionPress={handleSuggestionPress}
+        suggestionExtractor={(suggestion: AutocompleteOption) => suggestion.label}
+        containerStyle={styles.autocompleteContainer}
+        inputStyle={{
+          padding: 12,
+          borderRadius: 8,
+          fontSize: 16,
+          borderWidth: 1,
+          backgroundColor: colors.backgroundCard,
+          borderColor: colors.border,
+          color: colors.text,
+          ...(multiline ? { minHeight: 80, textAlignVertical: "top" as const } : {}),
+        }}
+        flatListStyle={{
+          marginTop: 4,
+          borderRadius: 8,
+          borderWidth: 1,
+          borderColor: "transparent",
+          maxHeight: 200,
+          backgroundColor: colors.backgroundCard,
+          ...(numColumns > 1 ? { flexDirection: "row", flexWrap: "wrap" } : {}),
+        }}
+        renderSuggestion={renderSuggestion}
+        inputProps={{
+          placeholder,
+          placeholderTextColor: colors.textDim,
+          value,
+          onChangeText,
+          autoCapitalize,
+          onBlur,
+          onSubmitEditing,
+        }}
+        allowCustomTags={false}
+        parseChars={[]}
       />
       {hint && (
         <Text style={[styles.hint, { color: colors.textDim }]}>{hint}</Text>
       )}
-    }
+    </View>
   )
 }
 
@@ -176,6 +154,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     borderWidth: 1,
   } as ViewStyle & TextStyle,
+  autocompleteContainer: {
+    borderWidth: 0,
+  } as ViewStyle,
   flatListStyle: {
     marginTop: 4,
     borderRadius: 8,
@@ -194,16 +175,5 @@ const styles = StyleSheet.create({
   hint: {
     fontSize: 12,
     marginTop: 4,
-  } as TextStyle,
-  tagContainer: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 16,
-    flexDirection: "row",
-    alignItems: "center",
-  } as ViewStyle,
-  tagText: {
-    fontSize: 14,
-    marginLeft: 4,
   } as TextStyle,
 })
