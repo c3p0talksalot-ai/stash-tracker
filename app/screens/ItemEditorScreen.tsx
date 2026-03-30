@@ -16,7 +16,6 @@ import { useNavigation } from "@react-navigation/native"
 import { useAppTheme } from "@/theme/context"
 import { useSettings } from "@/context/SettingsContext"
 import { getItem, createItem, updateItem, deleteItem, getLocationSuggestions, getPropertyKeySuggestions, getPropertyUnitSuggestions, getTagSuggestions, getAllItems, type AutocompleteOption } from "@/services/items"
-import { AutocompleteInput } from "@/components/AutocompleteInput"
 import { Icon } from "@/components/Icon"
 import type { AppStackScreenProps } from "@/navigators/navigationTypes"
 import type { ThemedStyle } from "@/theme/types"
@@ -354,7 +353,6 @@ export function ItemEditorScreen({ navigation, route }: Props) {
     setIsSaving(true)
     try {
       if (isEditing && itemId) {
-        await updateItem(itemId, {
           name: nameRef.current || name,
           description: descriptionRef.current || description,
           location: locationRef.current || location,
@@ -481,11 +479,13 @@ export function ItemEditorScreen({ navigation, route }: Props) {
         <View style={themed($field)}>
           <Text style={themed($label)}>Name *</Text>
           <TextInput
+            style={themed($input)}
             value={name}
-            onChangeText={(text) => { setName(text); nameRef.current = text; if (debounceTimer.current) clearTimeout(debounceTimer.current); debounceTimer.current = setTimeout(() => { if (autosave && hasUnsavedChanges && !isSaving) handleSaveInternal() }, 1500) } }
-
-            placeholder="Enter item name"
+            onChangeText={(text) => { setName(text); nameRef.current = text; clearTimeout(debounceTimer.current); debounceTimer.current = setTimeout(() => { if (autosave && hasUnsavedChanges && !isSaving) handleSaveInternal() }, 1500) } }
             onBlur={handleBlur}
+            placeholder="Enter item name"
+            placeholderTextColor={colors.textDim}
+            onEndEditing={handleBlur}
             onSubmitEditing={handleBlur}
           />
         </View>
@@ -493,11 +493,13 @@ export function ItemEditorScreen({ navigation, route }: Props) {
         <View style={themed($field)}>
           <Text style={themed($label)}>Location</Text>
           <TextInput
+            style={themed($input)}
             value={location}
-            onChangeText={(text) => { setLocation(text); locationRef.current = text; if (debounceTimer.current) clearTimeout(debounceTimer.current); debounceTimer.current = setTimeout(() => { if (autosave && hasUnsavedChanges && !isSaving) handleSaveInternal() }, 1500) } }
-
+            onChangeText={(text) => { setLocation(text); locationRef.current = text; clearTimeout(debounceTimer.current); debounceTimer.current = setTimeout(() => { if (autosave && hasUnsavedChanges && !isSaving) handleSaveInternal() }, 1500) } }
             placeholder="e.g., Garage, Closet"
+            placeholderTextColor={colors.textDim}
             onBlur={handleBlur}
+            onEndEditing={handleBlur}
             onSubmitEditing={handleBlur}
           />
         </View>
@@ -507,7 +509,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
           <TextInput
             style={[themed($input), { minHeight: 80, textAlignVertical: "top" }]}
             value={description}
-            onChangeText={(text) => { setDescription(text); descriptionRef.current = text; if (debounceTimer.current) clearTimeout(debounceTimer.current); debounceTimer.current = setTimeout(() => { if (autosave && hasUnsavedChanges && !isSaving) handleSaveInternal() }, 1500) } }
+            onChangeText={(text) => { setDescription(text); descriptionRef.current = text; clearTimeout(debounceTimer.current); debounceTimer.current = setTimeout(() => { if (autosave && hasUnsavedChanges && !isSaving) handleSaveInternal() }, 1500) } }
             placeholder="Enter description"
             placeholderTextColor={colors.textDim}
             multiline
@@ -528,13 +530,14 @@ export function ItemEditorScreen({ navigation, route }: Props) {
             ))}
             <View style={themed($tagInputContainer)}>
               <TextInput
+                style={themed($tagInputInline)}
                 value={newTag}
                 onChangeText={setNewTag}
-    
                 placeholder="+"
-                autoCapitalize="none"
+                placeholderTextColor={colors.textDim}
                 onSubmitEditing={() => { addTag(newTag); handleBlur(); }}
-                onBlur={handleBlur}
+                onEndEditing={handleBlur}
+            onSubmitEditing={handleBlur}
               />
             </View>
           </View>
@@ -573,11 +576,12 @@ export function ItemEditorScreen({ navigation, route }: Props) {
           </View>
           <View style={themed($propertyInputRow)}>
             <TextInput
+              ref={newPropUnitRef}
+              style={[themed($input), { flex: 1 }]}
               value={newPropUnit}
               onChangeText={setNewPropUnit}
-  
               placeholder="Unit (optional)"
-              autoCapitalize="none"
+              placeholderTextColor={colors.textDim}
             />
             <TouchableOpacity onPress={addProperty} style={themed($addButton)}>
               <Text style={themed($addButtonText)}>Add</Text>
