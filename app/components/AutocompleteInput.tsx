@@ -4,7 +4,7 @@ import {
   Text,
   TextInput,
   StyleSheet,
-  FlatList,
+  
   TouchableOpacity,
   useWindowDimensions,
   ViewStyle,
@@ -112,26 +112,21 @@ export function AutocompleteInput({
             numColumns > 1 && { flexDirection: "row", flexWrap: "wrap" },
           ]}
         >
-          <FlatList
-            data={filteredSuggestions}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={[
-                  styles.suggestionItem,
-                  { borderBottomColor: colors.border },
-                  numColumns > 1 && { width: `${100 / numColumns}%` },
-                ]}
-                onPress={() => handleSelect(item)}
-              >
-                <Text style={[styles.suggestionText, { color: colors.text }]}>
-                  {item.label}
-                </Text>
-              </TouchableOpacity>
-            )}
-            keyboardShouldPersistTaps="handled"
-            style={styles.suggestionsList}
-          />
+          {filteredSuggestions.map((item) => (
+            <TouchableOpacity
+              key={item.id}
+              style={[
+                styles.suggestionItem,
+                { borderBottomColor: colors.border },
+                numColumns > 1 && { width: `${100 / numColumns}%` },
+              ]}
+              onPress={() => handleSelect(item)}
+            >
+              <Text style={[styles.suggestionText, { color: colors.text }]}>
+                {item.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </View>
       )}
       {hint && (
