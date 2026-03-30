@@ -480,10 +480,10 @@ export function ItemEditorScreen({ navigation, route }: Props) {
       <View style={themed($content)}>
         <View style={themed($field)}>
           <Text style={themed($label)}>Name *</Text>
-          <AutocompleteInput
+          <TextInput
             value={name}
             onChangeText={(text) => { setName(text); nameRef.current = text; if (debounceTimer.current) clearTimeout(debounceTimer.current); debounceTimer.current = setTimeout(() => { if (autosave && hasUnsavedChanges && !isSaving) handleSaveInternal() }, 1500) } }
-            suggestions={itemNameSuggestions}
+
             placeholder="Enter item name"
             onBlur={handleBlur}
             onSubmitEditing={handleBlur}
@@ -492,10 +492,10 @@ export function ItemEditorScreen({ navigation, route }: Props) {
 
         <View style={themed($field)}>
           <Text style={themed($label)}>Location</Text>
-          <AutocompleteInput
+          <TextInput
             value={location}
             onChangeText={(text) => { setLocation(text); locationRef.current = text; if (debounceTimer.current) clearTimeout(debounceTimer.current); debounceTimer.current = setTimeout(() => { if (autosave && hasUnsavedChanges && !isSaving) handleSaveInternal() }, 1500) } }
-            suggestions={locationSuggestions}
+
             placeholder="e.g., Garage, Closet"
             onBlur={handleBlur}
             onSubmitEditing={handleBlur}
@@ -527,10 +527,10 @@ export function ItemEditorScreen({ navigation, route }: Props) {
               </TouchableOpacity>
             ))}
             <View style={themed($tagInputContainer)}>
-              <AutocompleteInput
+              <TextInput
                 value={newTag}
                 onChangeText={setNewTag}
-                suggestions={tagSuggestions}
+    
                 placeholder="+"
                 autoCapitalize="none"
                 onSubmitEditing={() => { addTag(newTag); handleBlur(); }}
@@ -572,10 +572,10 @@ export function ItemEditorScreen({ navigation, route }: Props) {
             />
           </View>
           <View style={themed($propertyInputRow)}>
-            <AutocompleteInput
+            <TextInput
               value={newPropUnit}
               onChangeText={setNewPropUnit}
-              suggestions={propertyUnitSuggestions}
+  
               placeholder="Unit (optional)"
               autoCapitalize="none"
             />
