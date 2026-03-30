@@ -405,8 +405,8 @@ export function ItemEditorScreen({ navigation, route }: Props) {
         <View style={themed($field)}>
           <Text style={themed($label)}>Tags</Text>
           <View style={themed($tagsContainer)}>
-            {tags.map((tag) => (
-              <TouchableOpacity key={tag} onPress={() => removeTag(tag)} style={themed($tagChip)}>
+            {tags.map((tag, index) => (
+              <TouchableOpacity key={`${tag}-${index}`} onPress={() => removeTag(tag)} style={themed($tagChip)}>
                 <Icon icon="x" size={14} />
                 <Text style={themed($tagChipText)}>{tag}</Text>
               </TouchableOpacity>
