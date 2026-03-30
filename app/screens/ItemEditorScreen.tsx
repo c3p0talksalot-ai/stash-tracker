@@ -38,6 +38,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
   const [location, setLocation] = useState("")
   const [tags, setTags] = useState<string[]>([])
   const [newTag, setNewTag] = useState("")
+  const newTagRef = useRef("")
   const [properties, setProperties] = useState<{ key: string; value: string; unit?: string }[]>([])
   const [newPropKey, setNewPropKey] = useState("")
   const [newPropValue, setNewPropValue] = useState("")
@@ -204,10 +205,15 @@ export function ItemEditorScreen({ navigation, route }: Props) {
   }
 
   const addTag = (tag: string) => {
+    console.log("[addTag] Called with:", tag, "current tags:", tags)
     if (tag && !tags.includes(tag)) {
+      console.log("[addTag] Adding tag:", tag)
       setTags(prev => [...prev, tag])
+    } else {
+      console.log("[addTag] NOT adding - duplicate or empty:", { tag, exists: tags.includes(tag) })
     }
     setNewTag("")
+    newTagRef.current = ""
   }
 
   const removeTag = (tag: string) => {
@@ -220,18 +226,26 @@ export function ItemEditorScreen({ navigation, route }: Props) {
     const value = (newPropValue || newPropValueRef.current).trim()
     const unit = (newPropUnit || newPropUnitRef.current).trim()
 
+    console.log("[addProperty] Called with:", { key, value, unit, isEditing, autosave, isSaving })
+
     // Key + Value or Key + Unit = save property
     if (key && (value || unit)) {
+      console.log("[addProperty] Saving property:", { key, value, unit })
       setProperties(prev => [...prev, { key, value: value || "", unit: unit || undefined }])
       setNewPropKey("")
       setNewPropValue("")
       setNewPropUnit("")
+      newPropKeyRef.current = ""
+      newPropValueRef.current = ""
+      newPropUnitRef.current = ""
       // Trigger save after adding property
       if (autosave && isEditing && !isSaving) {
+        console.log("[addProperty] Calling handleSaveInternal")
         handleSaveInternal()
       }
     } else if (key && !value && !unit) {
       // Key only - show dialog
+      console.log("[addProperty] Showing key-only dialog for:", key)
       Alert.alert(
         "Key Only",
         `You've entered a key "${key}" without a value. Do you want to add this key only?`,
@@ -240,16 +254,22 @@ export function ItemEditorScreen({ navigation, route }: Props) {
           { 
             text: "Add Key Only", 
             onPress: () => {
+              console.log("[addProperty] Dialog confirmed, adding key-only:", key)
               setProperties(prev => [...prev, { key, value: "", unit: undefined }])
               setNewPropKey("")
               setNewPropUnit("")
+              newPropKeyRef.current = ""
+              newPropUnitRef.current = ""
               if (autosave && isEditing && !isSaving) {
+                console.log("[addProperty] Dialog calling handleSaveInternal")
                 handleSaveInternal()
               }
             }
           },
         ]
       )
+    } else {
+      console.log("[addProperty] NOT SAVING - missing key/value/unit:", { key, value, unit })
     }
   }
 
@@ -259,6 +279,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
 
   // Internal save function used by autosave and manual save
   const handleSaveInternal = async (skipReload = false) => {
+    console.log("[handleSaveInternal] Called. isEditing:", isEditing, "itemId:", itemId, "tags:", tags, "properties:", properties)
     if (!name.trim()) {
       if (!autosave) {
         Alert.alert("Error", "Please enter an item name")
@@ -269,21 +290,25 @@ export function ItemEditorScreen({ navigation, route }: Props) {
     setIsSaving(true)
     try {
       if (isEditing && itemId) {
-        await updateItem(itemId, {
+        const updateData = {
           name: nameRef.current || name,
           description: descriptionRef.current || description,
           location: locationRef.current || location,
           tags,
           properties,
-        })
+        }
+        console.log("[handleSaveInternal] Updating item:", itemId, updateData)
+        await updateItem(itemId, updateData)
       } else {
-        await createItem({
+        const createData = {
           name: nameRef.current || name,
           description: descriptionRef.current || description,
           location: locationRef.current || location,
           tags,
           properties,
-        })
+        }
+        console.log("[handleSaveInternal] Creating item:", createData)
+        await createItem(createData)
       }
       // Update original data hash after save
       originalItemData.current = getCurrentDataHash()
@@ -446,11 +471,11 @@ export function ItemEditorScreen({ navigation, route }: Props) {
             <View style={themed($tagInputContainer)}>
               <AutocompleteInput
                 value={newTag}
-                onChangeText={setNewTag}
+                onChangeText={(text) => { setNewTag(text); newTagRef.current = text }}
                 suggestions={tagSuggestions}
                 placeholder="+"
                 inputStyle={themed($tagInputInline)}
-                onSubmitEditing={() => { addTag(newTag); handleBlur(); }}
+                onSubmitEditing={() => { addTag(newTag || newTagRef.current); handleBlur(); }}
                 onBlur={handleBlur}
               />
             </View>
