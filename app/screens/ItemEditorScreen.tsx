@@ -42,6 +42,11 @@ export function ItemEditorScreen({ navigation, route }: Props) {
   const [newPropKey, setNewPropKey] = useState("")
   const [newPropValue, setNewPropValue] = useState("")
   const [newPropUnit, setNewPropUnit] = useState("")
+  
+  // Refs for property input values
+  const newPropKeyRef = useRef("")
+  const newPropValueRef = useRef("")
+  const newPropUnitRef = useRef("")
   const [loading, setLoading] = useState(isEditing)
   const [menuVisible, setMenuVisible] = useState(false)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
@@ -210,9 +215,10 @@ export function ItemEditorScreen({ navigation, route }: Props) {
   }
 
   const addProperty = () => {
-    const key = newPropKey.trim()
-    const value = newPropValue.trim()
-    const unit = newPropUnit.trim()
+    // Use ref values if state is empty (keyboard dismissed)
+    const key = (newPropKey || newPropKeyRef.current).trim()
+    const value = (newPropValue || newPropValueRef.current).trim()
+    const unit = (newPropUnit || newPropUnitRef.current).trim()
 
     // Key + Value or Key + Unit = save property
     if (key && (value || unit)) {
@@ -467,7 +473,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
           <View style={themed($propertyInputRow)}>
             <AutocompleteInput
               value={newPropKey}
-              onChangeText={setNewPropKey}
+              onChangeText={(text) => { setNewPropKey(text); newPropKeyRef.current = text }}
               suggestions={propertyKeySuggestions}
               placeholder="Key (e.g., brand)"
               inputStyle={{ flex: 1, marginRight: 8 }}
@@ -475,7 +481,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
             <TextInput
               style={[themed($input), { flex: 1, marginRight: 8 }]}
               value={newPropValue}
-              onChangeText={setNewPropValue}
+              onChangeText={(text) => { setNewPropValue(text); newPropValueRef.current = text }}
               placeholder="Value"
               placeholderTextColor={colors.textDim}
             />
@@ -483,7 +489,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
           <View style={themed($propertyInputRow)}>
             <AutocompleteInput
               value={newPropUnit}
-              onChangeText={setNewPropUnit}
+              onChangeText={(text) => { setNewPropUnit(text); newPropUnitRef.current = text }}
               suggestions={propertyUnitSuggestions}
               placeholder="Unit (optional)"
               inputStyle={{ flex: 1 }}
