@@ -210,29 +210,33 @@ export function ItemEditorScreen({ navigation, route }: Props) {
   }
 
   const addProperty = () => {
+    const key = newPropKey.trim()
+    const value = newPropValue.trim()
+    const unit = newPropUnit.trim()
+
+    // Clear inputs immediately to prevent stale state
+    setNewPropKey("")
+    setNewPropValue("")
+    setNewPropUnit("")
+
     // Key + Value or Key + Unit = save property
-    if (newPropKey && (newPropValue || newPropUnit)) {
-      setProperties(prev => [...prev, { key: newPropKey, value: newPropValue || "", unit: newPropUnit || undefined }])
-      setNewPropKey("")
-      setNewPropValue("")
-      setNewPropUnit("")
+    if (key && (value || unit)) {
+      setProperties(prev => [...prev, { key, value: value || "", unit: unit || undefined }])
       // Trigger save after adding property
       if (autosave && isEditing && !isSaving) {
         handleSaveInternal()
       }
-    } else if (newPropKey && !newPropValue && !newPropUnit) {
+    } else if (key && !value && !unit) {
       // Key only - show dialog
       Alert.alert(
         "Key Only",
-        `You've entered a key "${newPropKey}" without a value. Do you want to add this key only?`,
+        `You've entered a key "${key}" without a value. Do you want to add this key only?`,
         [
           { text: "Cancel", style: "cancel" },
           { 
             text: "Add Key Only", 
             onPress: () => {
-              setProperties(prev => [...prev, { key: newPropKey, value: "", unit: undefined }])
-              setNewPropKey("")
-              setNewPropUnit("")
+              setProperties(prev => [...prev, { key, value: "", unit: undefined }])
               if (autosave && isEditing && !isSaving) {
                 handleSaveInternal()
               }
