@@ -231,7 +231,8 @@ export function ItemEditorScreen({ navigation, route }: Props) {
     // Key + Value or Key + Unit = save property
     if (key && (value || unit)) {
       console.log("[addProperty] Saving property:", { key, value, unit })
-      setProperties(prev => [...prev, { key, value: value || "", unit: unit || undefined }])
+      const newProps = [...properties, { key, value: value || "", unit: unit || undefined }]
+      setProperties(newProps)
       setNewPropKey("")
       setNewPropValue("")
       setNewPropUnit("")
@@ -240,8 +241,8 @@ export function ItemEditorScreen({ navigation, route }: Props) {
       newPropUnitRef.current = ""
       // Trigger save after adding property
       if (autosave && isEditing && !isSaving) {
-        console.log("[addProperty] Calling handleSaveInternal")
-        handleSaveInternal()
+        console.log("[addProperty] Calling handleSaveInternal with new properties")
+        handleSaveInternal(false, undefined, newProps)
       }
     } else if (key && !value && !unit) {
       // Key only - show dialog
@@ -293,7 +294,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
   const handleSaveInternal = async (skipReload = false, overrideTags?: string[], overrideProperties?: { key: string; value: string; unit?: string }[]) => {
     const tagsToSave = overrideTags ?? tags
     const propsToSave = overrideProperties ?? properties
-    console.log("[handleSaveInternal] Called. isEditing:", isEditing, "itemId:", itemId, "tags:", tagsToSave, "properties:", propsToSave)
+    console.log("[handleSaveInternal] Called. isEditing:", isEditing, "itemId:", itemId, "overrideTags:", overrideTags, "overrideProps:", overrideProperties, "tagsToSave:", tagsToSave, "propsToSave:", propsToSave)
     if (!name.trim()) {
       if (!autosave) {
         Alert.alert("Error", "Please enter an item name")
