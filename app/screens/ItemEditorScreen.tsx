@@ -43,6 +43,8 @@ export function ItemEditorScreen({ navigation, route }: Props) {
   const [newPropKey, setNewPropKey] = useState("")
   const [newPropValue, setNewPropValue] = useState("")
   const [newPropUnit, setNewPropUnit] = useState("")
+  const newPropValueInputRef = useRef<TextInput>(null)
+  const newPropUnitInputRef = useRef<TextInput>(null)
   
   // Refs for property input values
   const newPropKeyRef = useRef("")
@@ -267,15 +269,15 @@ export function ItemEditorScreen({ navigation, route }: Props) {
           { 
             text: "Add Value", 
             onPress: () => {
-              // Just close dialog - user can now add value
-              console.log("[addProperty] User chose Add Value")
+              console.log("[addProperty] User chose Add Value, focusing value input")
+              setTimeout(() => newPropValueInputRef.current?.focus(), 100)
             }
           },
           { 
             text: "Add Unit", 
             onPress: () => {
-              // Just close dialog - user can now add unit
-              console.log("[addProperty] User chose Add Unit")
+              console.log("[addProperty] User chose Add Unit, focusing unit input")
+              setTimeout(() => newPropUnitInputRef.current?.focus(), 100)
             }
           },
         ]
@@ -518,6 +520,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
               inputStyle={{ flex: 1, marginRight: 8 }}
             />
             <TextInput
+              ref={newPropValueInputRef}
               style={[themed($input), { flex: 1, marginRight: 8 }]}
               value={newPropValue}
               onChangeText={(text) => { setNewPropValue(text); newPropValueRef.current = text }}
@@ -532,6 +535,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
               suggestions={propertyUnitSuggestions}
               placeholder="Unit (optional)"
               inputStyle={{ flex: 1 }}
+              inputRef={newPropUnitInputRef}
             />
             <TouchableOpacity onPress={() => { Keyboard.dismiss(); addProperty(); }} style={themed($addButton)}>
               <Text style={themed($addButtonText)}>Add</Text>

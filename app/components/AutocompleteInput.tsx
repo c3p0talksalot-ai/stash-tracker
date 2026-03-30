@@ -31,6 +31,7 @@ interface AutocompleteInputProps {
   onSubmitEditing?: () => void
   autoCapitalize?: "none" | "sentences" | "words" | "characters"
   inputStyle?: ViewStyle
+  inputRef?: React.RefObject<TextInput>
 }
 
 export function AutocompleteInput({
@@ -85,6 +86,7 @@ export function AutocompleteInput({
         <Text style={[styles.label, { color: colors.text }]}>{label}</Text>
       )}
       <TextInput
+        ref={inputRef}
         style={[
           styles.input,
           { backgroundColor: colors.backgroundCard, borderColor: colors.border, color: colors.text },
