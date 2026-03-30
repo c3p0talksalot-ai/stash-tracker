@@ -419,7 +419,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
                 placeholder="+"
                 inputStyle={themed($tagInputInline)}
                 onSubmitEditing={() => { addTag(newTag); handleBlur(); }}
-                onBlur={() => { addTag(newTag); handleBlur(); }}
+                onBlur={handleBlur}
               />
             </View>
           </View>
