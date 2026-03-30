@@ -278,7 +278,6 @@ export function ItemEditorScreen({ navigation, route }: Props) {
               console.log("[addProperty] User chose Add Unit")
             }
           },
-          { text: "Cancel", style: "cancel" },
         ]
       )
     } else {
