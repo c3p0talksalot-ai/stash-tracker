@@ -353,6 +353,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
     setIsSaving(true)
     try {
       if (isEditing && itemId) {
+        await updateItem(itemId, {
           name: nameRef.current || name,
           description: descriptionRef.current || description,
           location: locationRef.current || location,
