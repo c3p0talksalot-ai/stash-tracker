@@ -40,6 +40,12 @@ export function ItemEditorScreen({ navigation, route }: Props) {
   const [newPropKey, setNewPropKey] = useState("")
   const [newPropValue, setNewPropValue] = useState("")
   const [newPropUnit, setNewPropUnit] = useState("")
+  
+  // Refs for focusing property inputs
+  const newPropKeyRef = useRef<TextInput>(null)
+  const newPropValueRef = useRef<TextInput>(null)
+  const newPropUnitRef = useRef<TextInput>(null)
+  
   const [loading, setLoading] = useState(isEditing)
   const [menuVisible, setMenuVisible] = useState(false)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
@@ -218,6 +224,107 @@ export function ItemEditorScreen({ navigation, route }: Props) {
   }
 
   const addProperty = () => {
+    // Check if user is trying to add a property with key but EMPTY value and unit
+    if (newPropKey && !newPropValue && !newPropUnit) {
+      // Check if tag with that key already exists
+      const existingTag = tagSuggestions.find(
+        tag => tag.label.toLowerCase() === newPropKey.toLowerCase()
+      )
+      
+      if (existingTag) {
+        // Tag already exists - show alert with options
+        Alert.alert(
+          `Tag '${newPropKey}' already exists`,
+          "What would you like to do?",
+          [
+            {
+              text: "Add Value",
+              onPress: () => {
+                setNewPropValue("")
+                setNewPropUnit("")
+                // Focus the value input after a small delay to let React render
+                setTimeout(() => {
+                  newPropValueRef.current?.focus()
+                }, 100)
+              }
+            },
+            {
+              text: "Add Unit",
+              onPress: () => {
+                setNewPropValue("")
+                setNewPropUnit("")
+                setTimeout(() => {
+                  newPropUnitRef.current?.focus()
+                }, 100)
+              }
+            },
+            {
+              text: "Cancel",
+              style: "cancel",
+              onPress: () => {
+                setNewPropKey("")
+                setNewPropValue("")
+                setNewPropUnit("")
+              }
+            },
+          ]
+        )
+      } else {
+        // Tag doesn't exist - show alert asking what user wants to do
+        Alert.alert(
+          "This looks like a tag. What would you like to do?",
+          "",
+          [
+            {
+              text: "Add as Tag",
+              onPress: () => {
+                // Add as tag (addTag expects tag name, use the key)
+                addTag(newPropKey)
+                setNewPropKey("")
+                setNewPropValue("")
+                setNewPropUnit("")
+                // Trigger save after adding tag
+                if (autosave && isEditing && !isSaving) {
+                  handleSaveInternal()
+                }
+              }
+            },
+            {
+              text: "Add Value",
+              onPress: () => {
+                setNewPropValue("")
+                setNewPropUnit("")
+                setTimeout(() => {
+                  newPropValueRef.current?.focus()
+                }, 100)
+              }
+            },
+            {
+              text: "Add Unit",
+              onPress: () => {
+                setNewPropValue("")
+                setNewPropUnit("")
+                setTimeout(() => {
+                  newPropUnitRef.current?.focus()
+                }, 100)
+              }
+            },
+            {
+              text: "Cancel",
+              style: "cancel",
+              onPress: () => {
+                setNewPropKey("")
+                setNewPropValue("")
+                setNewPropUnit("")
+              }
+            },
+          ]
+        )
+      }
+      return
+    }
+    
+    // Normal property add (with key and value)
     if (newPropKey && newPropValue) {
       setProperties(prev => [...prev, { key: newPropKey, value: newPropValue, unit: newPropUnit || undefined }])
       setNewPropKey("")
@@ -451,6 +558,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
           ))}
           <View style={themed($propertyInputRow)}>
             <TextInput
+              ref={newPropKeyRef}
               style={[themed($input), { flex: 1, marginRight: 8 }]}
               value={newPropKey}
               onChangeText={setNewPropKey}
@@ -458,6 +566,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
               placeholderTextColor={colors.textDim}
             />
             <TextInput
+              ref={newPropValueRef}
               style={[themed($input), { flex: 1, marginRight: 8 }]}
               value={newPropValue}
               onChangeText={setNewPropValue}
@@ -467,6 +576,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
           </View>
           <View style={themed($propertyInputRow)}>
             <TextInput
+              ref={newPropUnitRef}
               style={[themed($input), { flex: 1 }]}
               value={newPropUnit}
               onChangeText={setNewPropUnit}
