@@ -262,7 +262,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
               setNewPropKey("")
               newPropKeyRef.current = ""
               if (autosave && isEditing && !isSaving) {
-                handleSaveInternal(newTags, [])
+                handleSaveInternal(false, newTags, undefined)
               }
             }
           },
@@ -292,9 +292,9 @@ export function ItemEditorScreen({ navigation, route }: Props) {
   }
 
   // Internal save function used by autosave and manual save
-  const handleSaveInternal = async (skipReload = false, overrideTags?: string[], overrideProperties?: { key: string; value: string; unit?: string }[]) => {
-    const tagsToSave = overrideTags ?? tags
-    const propsToSave = overrideProperties ?? properties
+  const handleSaveInternal = async (skipReload = false, overrideTags?: string[] | undefined, overrideProperties?: { key: string; value: string; unit?: string }[] | undefined) => {
+    const tagsToSave = overrideTags !== undefined ? overrideTags : tags
+    const propsToSave = overrideProperties !== undefined ? overrideProperties : properties
     console.log("[handleSaveInternal] Called. isEditing:", isEditing, "itemId:", itemId, "overrideTags:", overrideTags, "overrideProps:", overrideProperties, "tagsToSave:", tagsToSave, "propsToSave:", propsToSave)
     if (!name.trim()) {
       if (!autosave) {
