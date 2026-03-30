@@ -265,16 +265,15 @@ export function ItemEditorScreen({ navigation, route }: Props) {
             }
           },
           { 
-            text: "Add Key Only", 
+            text: "Add as Tag", 
             onPress: () => {
-              console.log("[addProperty] Dialog confirmed, adding key-only:", key)
-              setProperties(prev => [...prev, { key, value: "", unit: undefined }])
+              console.log("[addProperty] Adding key as tag:", key)
+              if (!tags.includes(key)) {
+                setTags(prev => [...prev, key])
+              }
               setNewPropKey("")
-              setNewPropUnit("")
               newPropKeyRef.current = ""
-              newPropUnitRef.current = ""
               if (autosave && isEditing && !isSaving) {
-                console.log("[addProperty] Dialog calling handleSaveInternal")
                 handleSaveInternal()
               }
             }
