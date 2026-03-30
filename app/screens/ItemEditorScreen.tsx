@@ -6,6 +6,7 @@ import {
   TextInput,
   ScrollView,
   TouchableOpacity,
+  Keyboard,
   Alert,
   TextStyle,
   ViewStyle,
@@ -462,7 +463,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
               placeholder="Unit (optional)"
               inputStyle={{ flex: 1 }}
             />
-            <TouchableOpacity onPress={addProperty} style={themed($addButton)}>
+            <TouchableOpacity onPress={() => { Keyboard.dismiss(); addProperty(); }} style={themed($addButton)}>
               <Text style={themed($addButtonText)}>Add</Text>
             </TouchableOpacity>
           </View>
