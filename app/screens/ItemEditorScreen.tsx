@@ -15,7 +15,7 @@ import {
 import { useNavigation } from "@react-navigation/native"
 import { useAppTheme } from "@/theme/context"
 import { useSettings } from "@/context/SettingsContext"
-import { getItem, createItem, updateItem, deleteItem, getAllItems, getLocationSuggestions, getPropertyUnitSuggestions, getTagSuggestions } from "@/services/items"
+import { getItem, createItem, updateItem, deleteItem, getAllItems, getLocationSuggestions, getPropertyKeySuggestions, getPropertyUnitSuggestions, getTagSuggestions } from "@/services/items"
 import { Icon } from "@/components/Icon"
 import { AutocompleteInput, type AutocompleteOption } from "@/components/AutocompleteInput"
 import type { AppStackScreenProps } from "@/navigators/navigationTypes"
@@ -49,6 +49,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
   // Autocomplete suggestions
   const [itemNameSuggestions, setItemNameSuggestions] = useState<AutocompleteOption[]>([])
   const [locationSuggestions, setLocationSuggestions] = useState<AutocompleteOption[]>([])
+  const [propertyKeySuggestions, setPropertyKeySuggestions] = useState<AutocompleteOption[]>([])
   const [propertyUnitSuggestions, setPropertyUnitSuggestions] = useState<AutocompleteOption[]>([])
   const [tagSuggestions, setTagSuggestions] = useState<AutocompleteOption[]>([])
   
@@ -128,13 +129,15 @@ export function ItemEditorScreen({ navigation, route }: Props) {
   useEffect(() => {
     const loadSuggestions = async () => {
       try {
-        const [locations, units, tags, items] = await Promise.all([
+        const [locations, keys, units, tags, items] = await Promise.all([
           getLocationSuggestions(),
+          getPropertyKeySuggestions(),
           getPropertyUnitSuggestions(),
           getTagSuggestions(),
           getAllItems(),
         ])
         setLocationSuggestions(locations)
+        setPropertyKeySuggestions(keys)
         setPropertyUnitSuggestions(units)
         setTagSuggestions(tags)
         setItemNameSuggestions(items.map((item) => ({ id: item.id, label: item.name })))
@@ -409,14 +412,14 @@ export function ItemEditorScreen({ navigation, route }: Props) {
               </TouchableOpacity>
             ))}
             <View style={themed($tagInputContainer)}>
-              <TextInput
-                style={themed($tagInputInline)}
+              <AutocompleteInput
                 value={newTag}
                 onChangeText={setNewTag}
+                suggestions={tagSuggestions}
                 placeholder="+"
-                placeholderTextColor={colors.textDim}
+                inputStyle={themed($tagInputInline)}
                 onSubmitEditing={() => { addTag(newTag); handleBlur(); }}
-                onEndEditing={handleBlur}
+                onBlur={() => { addTag(newTag); handleBlur(); }}
               />
             </View>
           </View>
@@ -436,12 +439,12 @@ export function ItemEditorScreen({ navigation, route }: Props) {
             </View>
           ))}
           <View style={themed($propertyInputRow)}>
-            <TextInput
-              style={[themed($input), { flex: 1, marginRight: 8 }]}
+            <AutocompleteInput
               value={newPropKey}
               onChangeText={setNewPropKey}
+              suggestions={propertyKeySuggestions}
               placeholder="Key (e.g., brand)"
-              placeholderTextColor={colors.textDim}
+              inputStyle={{ flex: 1, marginRight: 8 }}
             />
             <TextInput
               style={[themed($input), { flex: 1, marginRight: 8 }]}
@@ -452,12 +455,12 @@ export function ItemEditorScreen({ navigation, route }: Props) {
             />
           </View>
           <View style={themed($propertyInputRow)}>
-            <TextInput
-              style={[themed($input), { flex: 1 }]}
+            <AutocompleteInput
               value={newPropUnit}
               onChangeText={setNewPropUnit}
+              suggestions={propertyUnitSuggestions}
               placeholder="Unit (optional)"
-              placeholderTextColor={colors.textDim}
+              inputStyle={{ flex: 1 }}
             />
             <TouchableOpacity onPress={addProperty} style={themed($addButton)}>
               <Text style={themed($addButtonText)}>Add</Text>
