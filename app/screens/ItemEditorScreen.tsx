@@ -260,14 +260,15 @@ export function ItemEditorScreen({ navigation, route }: Props) {
               try {
                 // Find or create the tag in DB to get its ID
                 const tagId = await findOrCreateTag(key)
-                console.log("[addProperty] Tag ID:", tagId)
+                console.log("[addProperty] Tag ID:", tagId, "current tags:", tags)
                 const newTags = tags.includes(tagId) ? tags : [...tags, tagId]
+                console.log("[addProperty] New tags array:", newTags)
                 setTags(newTags)
                 setNewPropKey("")
                 newPropKeyRef.current = ""
-                // Call save AFTER state update - wait for next render
+                // Force save with explicit tags array
                 if (autosave && isEditing && !isSaving) {
-                  setTimeout(() => handleSaveInternal(false, newTags, undefined), 0)
+                  handleSaveInternal(false, newTags, undefined)
                 }
               } catch (e) {
                 console.error("[addProperty] Failed to add tag:", e)
