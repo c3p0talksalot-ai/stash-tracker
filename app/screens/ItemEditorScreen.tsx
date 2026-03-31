@@ -661,6 +661,8 @@ const $tagsContainer: ViewStyle = {
   flexWrap: "wrap",
   gap: 8,
   marginBottom: 8,
+  position: "relative",
+  zIndex: 10,
 }
 
 const $tagChip: ThemedStyle<ViewStyle> = ({ colors }) => ({
@@ -690,6 +692,7 @@ const $tagInputContainer: ThemedStyle<ViewStyle> = ({ colors }) => ({
   alignItems: "center",
   justifyContent: "center",
   position: "relative",
+  zIndex: 20,
 })
 
 const $tagInputInline: ThemedStyle<TextStyle> = ({ colors }) => ({
