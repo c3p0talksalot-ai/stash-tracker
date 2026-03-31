@@ -689,6 +689,7 @@ const $tagInputContainer: ThemedStyle<ViewStyle> = ({ colors }) => ({
   minWidth: 40,
   alignItems: "center",
   justifyContent: "center",
+  position: "relative",
 })
 
 const $tagInputInline: ThemedStyle<TextStyle> = ({ colors }) => ({
