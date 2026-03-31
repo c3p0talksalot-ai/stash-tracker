@@ -149,6 +149,8 @@ export function AutocompleteInput({
 const styles = StyleSheet.create({
   container: {
     marginBottom: 16,
+    position: "relative",
+    zIndex: 100,
   } as ViewStyle,
   label: {
     fontSize: 16,
@@ -169,7 +171,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
     borderRadius: 8,
     borderWidth: 1,
-    zIndex: 100,
+    zIndex: 200,
     elevation: 5,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
