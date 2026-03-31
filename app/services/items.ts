@@ -298,3 +298,25 @@ export async function getTagSuggestions(): Promise<AutocompleteOption[]> {
     }))
     .sort((a, b) => a.label.localeCompare(b.label))
 }
+
+// Find a tag by name, or create it if it doesn't exist
+export async function findOrCreateTag(tagName: string): Promise<string> {
+  const tagsCollection = database.get<Tag>("tags")
+  
+  // Try to find existing tag
+  const existingTags = await tagsCollection.query(Q.where("name", tagName)).fetch()
+  if (existingTags.length > 0) {
+    return existingTags[0].id
+  }
+  
+  // Create new tag
+  let newTagId = ""
+  await database.write(async () => {
+    const newTag = await tagsCollection.create((t) => {
+      t.name = tagName
+    })
+    newTagId = newTag.id
+  })
+  
+  return newTagId
+}

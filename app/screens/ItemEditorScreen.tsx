@@ -16,7 +16,7 @@ import {
 import { useNavigation } from "@react-navigation/native"
 import { useAppTheme } from "@/theme/context"
 import { useSettings } from "@/context/SettingsContext"
-import { getItem, createItem, updateItem, deleteItem, getAllItems, getLocationSuggestions, getPropertyKeySuggestions, getPropertyUnitSuggestions, getTagSuggestions } from "@/services/items"
+import { getItem, createItem, updateItem, deleteItem, getAllItems, getLocationSuggestions, getPropertyKeySuggestions, getPropertyUnitSuggestions, getTagSuggestions, findOrCreateTag } from "@/services/items"
 import { Icon } from "@/components/Icon"
 import { AutocompleteInput, type AutocompleteOption } from "@/components/AutocompleteInput"
 import type { AppStackScreenProps } from "@/navigators/navigationTypes"
@@ -255,14 +255,21 @@ export function ItemEditorScreen({ navigation, route }: Props) {
         [
           { 
             text: "Add as Tag", 
-            onPress: () => {
+            onPress: async () => {
               console.log("[addProperty] Adding key as tag:", key)
-              const newTags = tags.includes(key) ? tags : [...tags, key]
-              setTags(newTags)
-              setNewPropKey("")
-              newPropKeyRef.current = ""
-              if (autosave && isEditing && !isSaving) {
-                handleSaveInternal(false, newTags, undefined)
+              try {
+                // Find or create the tag in DB to get its ID
+                const tagId = await findOrCreateTag(key)
+                console.log("[addProperty] Tag ID:", tagId)
+                const newTags = tags.includes(tagId) ? tags : [...tags, tagId]
+                setTags(newTags)
+                setNewPropKey("")
+                newPropKeyRef.current = ""
+                if (autosave && isEditing && !isSaving) {
+                  handleSaveInternal(false, newTags, undefined)
+                }
+              } catch (e) {
+                console.error("[addProperty] Failed to add tag:", e)
               }
             }
           },
