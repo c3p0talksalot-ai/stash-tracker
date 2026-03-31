@@ -47,6 +47,7 @@ export function AutocompleteInput({
   onSubmitEditing,
   autoCapitalize = "sentences",
   inputStyle,
+  inputRef,
 }: AutocompleteInputProps) {
   const { theme } = useAppTheme()
   const { colors } = theme
