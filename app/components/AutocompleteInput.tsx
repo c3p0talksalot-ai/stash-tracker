@@ -73,6 +73,7 @@ export function AutocompleteInput({
   const showSuggestions = isFocused && filteredSuggestions.length > 0
 
   const handleSelect = (option: AutocompleteOption) => {
+    console.log("[AutocompleteInput] handleSelect:", option.label)
     onChangeText(option.label)
     if (onSelect) {
       onSelect(option)
@@ -124,6 +125,7 @@ export function AutocompleteInput({
                 numColumns > 1 && { width: `${100 / numColumns}%` },
               ]}
               onPress={() => handleSelect(item)}
+              activeOpacity={0.7}
             >
               <Text style={[styles.suggestionText, { color: colors.text }]}>
                 {item.label}
@@ -142,6 +144,7 @@ export function AutocompleteInput({
 const styles = StyleSheet.create({
   container: {
     marginBottom: 16,
+    zIndex: 100,
   } as ViewStyle,
   label: {
     fontSize: 16,
