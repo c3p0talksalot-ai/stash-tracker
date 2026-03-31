@@ -16,7 +16,7 @@ import {
 import { useNavigation } from "@react-navigation/native"
 import { useAppTheme } from "@/theme/context"
 import { useSettings } from "@/context/SettingsContext"
-import { getItem, createItem, updateItem, deleteItem, getAllItems, getLocationSuggestions, getPropertyKeySuggestions, getPropertyUnitSuggestions, getTagSuggestions, findOrCreateTag } from "@/services/items"
+import { getItem, createItem, updateItem, deleteItem, getAllItems, getLocationSuggestions, getPropertyKeySuggestions, getPropertyUnitSuggestions, getTagSuggestions, findOrCreateTag, getTagNames } from "@/services/items"
 import { Icon } from "@/components/Icon"
 import { AutocompleteInput, type AutocompleteOption } from "@/components/AutocompleteInput"
 import type { AppStackScreenProps } from "@/navigators/navigationTypes"
@@ -37,6 +37,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
   const [description, setDescription] = useState("")
   const [location, setLocation] = useState("")
   const [tags, setTags] = useState<string[]>([])
+  const [tagNames, setTagNames] = useState<Record<string, string>>({})
   const [newTag, setNewTag] = useState("")
   const newTagRef = useRef("")
   const [properties, setProperties] = useState<{ key: string; value: string; unit?: string }[]>([])
@@ -166,6 +167,9 @@ export function ItemEditorScreen({ navigation, route }: Props) {
         setLocation(item.location || "")
         setTags(item.tags)
         setProperties(item.properties)
+        // Load tag names for display
+        const names = await getTagNames(item.tags)
+        setTagNames(names)
         // Sync refs with loaded data
         nameRef.current = item.name
         descriptionRef.current = item.description || ""
@@ -264,6 +268,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
                 const newTags = tags.includes(tagId) ? tags : [...tags, tagId]
                 console.log("[addProperty] New tags array:", newTags)
                 setTags(newTags)
+                setTagNames(prev => ({ ...prev, [tagId]: key }))
                 setNewPropKey("")
                 newPropKeyRef.current = ""
                 // Force save with explicit tags array
@@ -490,7 +495,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
             {tags.map((tag, index) => (
               <TouchableOpacity key={`${tag}-${index}`} onPress={() => removeTag(tag)} style={themed($tagChip)}>
                 <Icon icon="x" size={14} />
-                <Text style={themed($tagChipText)}>{tag}</Text>
+                <Text style={themed($tagChipText)}>{tagNames[tag] || tag}</Text>
               </TouchableOpacity>
             ))}
             <View style={themed($tagInputContainer)}>

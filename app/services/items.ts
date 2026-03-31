@@ -322,3 +322,20 @@ export async function findOrCreateTag(tagName: string): Promise<string> {
   
   return newTagId
 }
+
+// Get tag names from IDs
+export async function getTagNames(tagIds: string[]): Promise<Record<string, string>> {
+  if (tagIds.length === 0) return {}
+  
+  const tagsCollection = database.get<Tag>("tags")
+  const allTags = await tagsCollection.query().fetch()
+  const tagMap: Record<string, string> = {}
+  
+  for (const tag of allTags) {
+    if (tagIds.includes(tag.id)) {
+      tagMap[tag.id] = tag.name
+    }
+  }
+  
+  return tagMap
+}
