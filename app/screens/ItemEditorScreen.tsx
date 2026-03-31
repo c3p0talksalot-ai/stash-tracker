@@ -636,6 +636,7 @@ const $content: ThemedStyle<ViewStyle> = ({ spacing }) => ({
 
 const $field: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   marginBottom: spacing.lg,
+  zIndex: 1,
 })
 
 const $label: ThemedStyle<TextStyle> = ({ colors }) => ({

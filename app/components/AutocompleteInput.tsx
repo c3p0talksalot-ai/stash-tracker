@@ -72,6 +72,11 @@ export function AutocompleteInput({
 
   const showSuggestions = isFocused && filteredSuggestions.length > 0
 
+  // Debug: log when suggestions change or focus changes
+  useEffect(() => {
+    console.log(`[AutocompleteInput] value="${value}", isFocused=${isFocused}, suggestions=${suggestions.length}, filtered=${filteredSuggestions.length}, show=${showSuggestions}`)
+  }, [value, isFocused, suggestions.length, filteredSuggestions.length, showSuggestions])
+
   const handleSelect = (option: AutocompleteOption) => {
     console.log("[AutocompleteInput] handleSelect:", option.label)
     onChangeText(option.label)
@@ -144,7 +149,6 @@ export function AutocompleteInput({
 const styles = StyleSheet.create({
   container: {
     marginBottom: 16,
-    zIndex: 1000,
   } as ViewStyle,
   label: {
     fontSize: 16,
@@ -165,7 +169,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
     borderRadius: 8,
     borderWidth: 1,
-    zIndex: 1000,
+    zIndex: 100,
     elevation: 5,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
