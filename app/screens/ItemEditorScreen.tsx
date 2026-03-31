@@ -150,6 +150,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
         setPropertyKeySuggestions(keys)
         setPropertyUnitSuggestions(units)
         setTagSuggestions(tags)
+        console.log("[loadSuggestions] tagSuggestions loaded:", tags.length, tags.map(t => t.label))
         setItemNameSuggestions(items.map((item) => ({ id: item.id, label: item.name })))
       } catch (e) {
         console.error("Failed to load suggestions:", e)

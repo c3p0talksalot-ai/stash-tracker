@@ -144,7 +144,7 @@ export function AutocompleteInput({
 const styles = StyleSheet.create({
   container: {
     marginBottom: 16,
-    zIndex: 100,
+    zIndex: 1000,
   } as ViewStyle,
   label: {
     fontSize: 16,
