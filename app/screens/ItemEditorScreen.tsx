@@ -265,8 +265,9 @@ export function ItemEditorScreen({ navigation, route }: Props) {
                 setTags(newTags)
                 setNewPropKey("")
                 newPropKeyRef.current = ""
+                // Call save AFTER state update - wait for next render
                 if (autosave && isEditing && !isSaving) {
-                  handleSaveInternal(false, newTags, undefined)
+                  setTimeout(() => handleSaveInternal(false, newTags, undefined), 0)
                 }
               } catch (e) {
                 console.error("[addProperty] Failed to add tag:", e)
