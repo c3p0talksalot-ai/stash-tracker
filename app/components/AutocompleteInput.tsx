@@ -148,7 +148,7 @@ export function AutocompleteInput({
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 16,
+    marginBottom: 8,
     position: "relative",
     zIndex: 100,
   } as ViewStyle,
@@ -166,11 +166,12 @@ const styles = StyleSheet.create({
   suggestionsContainer: {
     position: "absolute",
     top: "100%",
-    left: 0,
-    right: 0,
+    left: -10,
+    right: -10,
     marginTop: 4,
     borderRadius: 8,
     borderWidth: 1,
+    backgroundColor: "#fff",
     zIndex: 200,
     elevation: 5,
     shadowColor: "#000",
@@ -184,7 +185,9 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   suggestionItem: {
     padding: 12,
+    minHeight: 44,
     borderBottomWidth: 1,
+    justifyContent: "center",
   } as ViewStyle,
   suggestionText: {
     fontSize: 14,
