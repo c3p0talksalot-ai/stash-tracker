@@ -210,14 +210,31 @@ export function ItemEditorScreen({ navigation, route }: Props) {
     }
   }
 
-  const addTag = (tag: string) => {
+  const addTag = async (tag: string) => {
     console.log("[addTag] Called with:", tag, "current tags:", tags)
-    if (tag && !tags.includes(tag)) {
-      console.log("[addTag] Adding tag:", tag)
-      setTags(prev => [...prev, tag])
-    } else {
-      console.log("[addTag] NOT adding - duplicate or empty:", { tag, exists: tags.includes(tag) })
+    if (!tag) {
+      console.log("[addTag] NOT adding - empty tag")
+      setNewTag("")
+      newTagRef.current = ""
+      return
     }
+    
+    try {
+      // Convert tag name to ID
+      const tagId = await findOrCreateTag(tag)
+      console.log("[addTag] Tag ID:", tagId)
+      
+      if (!tags.includes(tagId)) {
+        console.log("[addTag] Adding tag ID:", tagId)
+        setTags(prev => [...prev, tagId])
+        setTagNames(prev => ({ ...prev, [tagId]: tag }))
+      } else {
+        console.log("[addTag] NOT adding - already exists:", tagId)
+      }
+    } catch (e) {
+      console.error("[addTag] Failed to add tag:", e)
+    }
+    
     setNewTag("")
     newTagRef.current = ""
   }
