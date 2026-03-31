@@ -161,8 +161,10 @@ export async function updateItem(id: string, input: Partial<ItemInput>): Promise
       }
     })
     
+    console.log("[updateItem] Saved tags:", input.tags)
     return itemToOutput(item)
-  } catch {
+  } catch (e) {
+    console.error("[updateItem] Failed to update item:", e)
     return null
   }
 }
