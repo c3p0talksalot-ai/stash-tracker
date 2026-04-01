@@ -117,7 +117,7 @@ export function AutocompleteInput({
         <View
           style={[
             styles.suggestionsContainer,
-            { backgroundColor: colors.backgroundCard, borderColor: colors.border },
+            { backgroundColor: "#1a1a1a", borderColor: colors.border },
             numColumns > 1 && { flexDirection: "row", flexWrap: "wrap" },
           ]}
         >
@@ -132,7 +132,7 @@ export function AutocompleteInput({
               onPress={() => handleSelect(item)}
               activeOpacity={0.7}
             >
-              <Text style={[styles.suggestionText, { color: colors.text }]}>
+              <Text style={[styles.suggestionText, { color: "#fff" }]}>
                 {item.label}
               </Text>
             </TouchableOpacity>
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
     borderRadius: 8,
     borderWidth: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#1a1a1a",
     zIndex: 200,
     elevation: 5,
     shadowColor: "#000",
@@ -182,17 +182,18 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   suggestionsList: {
     maxHeight: 200,
-    backgroundColor: "#fff",
+    backgroundColor: "#1a1a1a",
   } as ViewStyle,
   suggestionItem: {
     padding: 12,
     minHeight: 44,
     borderBottomWidth: 1,
+    borderBottomColor: "#444",
     justifyContent: "center",
   } as ViewStyle,
   suggestionText: {
     fontSize: 14,
-    color: "#000",
+    color: "#fff",
   } as TextStyle,
   hint: {
     fontSize: 12,
