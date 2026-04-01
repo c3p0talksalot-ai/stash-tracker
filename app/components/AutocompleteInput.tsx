@@ -218,6 +218,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#444",
     justifyContent: "center",
+    backgroundColor: "#ff0000", // DEBUG: bright red to see if rendering
   } as ViewStyle,
   suggestionText: {
     fontSize: 14,
