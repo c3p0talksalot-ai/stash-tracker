@@ -79,12 +79,15 @@ export function AutocompleteInput({
 
   const handleSelect = (option: AutocompleteOption) => {
     console.log("[AutocompleteInput] handleSelect:", option.label)
-    // Call onSelect first (parent handles adding tag), then clear input
+    // If parent has onSelect, let it handle the selection
     if (onSelect) {
       onSelect(option)
+      // Clear the input for next entry
+      onChangeText("")
+    } else {
+      // Default behavior: set the value
+      onChangeText(option.label)
     }
-    // Clear the input for next entry
-    onChangeText("")
     setIsFocused(false)
     Keyboard.dismiss()
   }
