@@ -227,8 +227,13 @@ export function ItemEditorScreen({ navigation, route }: Props) {
       
       if (!tags.includes(tagId)) {
         console.log("[addTag] Adding tag ID:", tagId)
-        setTags(prev => [...prev, tagId])
+        const newTags = [...tags, tagId]
+        setTags(newTags)
         setTagNames(prev => ({ ...prev, [tagId]: tag }))
+        // Save after adding tag
+        if (autosave && isEditing && !isSaving) {
+          handleSaveInternal(false, newTags, undefined)
+        }
       } else {
         console.log("[addTag] NOT adding - already exists:", tagId)
       }
