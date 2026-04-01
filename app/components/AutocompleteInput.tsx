@@ -65,11 +65,16 @@ export function AutocompleteInput({
 
   // Filter suggestions based on input
   const filteredSuggestions = useMemo(() => {
-    if (!value.trim()) return suggestions.slice(0, 10)
+    if (!value.trim()) {
+      console.log("[filter] empty value, returning first 10")
+      return suggestions.slice(0, 10)
+    }
     const lowerValue = value.toLowerCase()
-    return suggestions
+    const filtered = suggestions
       .filter((s) => s.label.toLowerCase().includes(lowerValue))
       .slice(0, 10)
+    console.log("[filter] value:", value, "lower:", lowerValue, "matched:", filtered.map(f => f.label))
+    return filtered
   }, [value, suggestions])
 
   const showSuggestions = isFocused && filteredSuggestions.length > 0
