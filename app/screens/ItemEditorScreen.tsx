@@ -523,7 +523,11 @@ export function ItemEditorScreen({ navigation, route }: Props) {
                 suggestions={tagSuggestions}
                 placeholder="+"
                 inputStyle={themed($tagInputInline)}
-                onSubmitEditing={() => { addTag(newTag || newTagRef.current); handleBlur(); }}
+                onSelect={(option) => {
+                  console.log("[tag autocomplete] selected:", option.label)
+                  addTag(option.label)
+                }}
+                onSubmitEditing={() => { addTag(newTag || newTagRef.current); setNewTag(""); newTagRef.current = "" }}
                 onBlur={handleBlur}
               />
             </View>

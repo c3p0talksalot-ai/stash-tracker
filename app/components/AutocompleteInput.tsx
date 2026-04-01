@@ -79,10 +79,12 @@ export function AutocompleteInput({
 
   const handleSelect = (option: AutocompleteOption) => {
     console.log("[AutocompleteInput] handleSelect:", option.label)
-    onChangeText(option.label)
+    // Call onSelect first (parent handles adding tag), then clear input
     if (onSelect) {
       onSelect(option)
     }
+    // Clear the input for next entry
+    onChangeText("")
     setIsFocused(false)
     Keyboard.dismiss()
   }
