@@ -550,7 +550,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
           <Text style={themed($hint)}>Suggestions: {availableTags.slice(0, 4).join(", ")}</Text>
         </View>
 
-        <View style={themed($field)}>
+        <View style={[themed($field), { zIndex: 5 }]}>
           <Text style={themed($label)}>Properties</Text>
           {properties.map((prop, index) => (
             <View key={index} style={themed($propertyRow)}>
@@ -778,6 +778,8 @@ const $propertyInputRow: ViewStyle = {
   flexDirection: "row",
   gap: 8,
   marginTop: 8,
+  position: "relative",
+  zIndex: 10,
 }
 
 const $iconButton: ThemedStyle<ViewStyle> = () => ({
