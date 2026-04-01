@@ -136,6 +136,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
   }, [itemId])
 
   // Load autocomplete suggestions on mount
+  const [allTags, setAllTags] = useState<AutocompleteOption[]>([])
   useEffect(() => {
     const loadSuggestions = async () => {
       try {
@@ -149,8 +150,11 @@ export function ItemEditorScreen({ navigation, route }: Props) {
         setLocationSuggestions(locations)
         setPropertyKeySuggestions(keys)
         setPropertyUnitSuggestions(units)
-        setTagSuggestions(tags)
-        console.log("[loadSuggestions] tagSuggestions loaded:", tags.length, tags.map(t => t.label))
+        setAllTags(tags)
+        // Filter out tags that are already added to this item
+        const availableTags = tags.filter(t => !tags.includes(t.id))
+        setTagSuggestions(availableTags)
+        console.log("[loadSuggestions] tagSuggestions loaded:", availableTags.length, availableTags.map(t => t.label))
         setItemNameSuggestions(items.map((item) => ({ id: item.id, label: item.name })))
       } catch (e) {
         console.error("Failed to load suggestions:", e)
@@ -158,6 +162,12 @@ export function ItemEditorScreen({ navigation, route }: Props) {
     }
     loadSuggestions()
   }, [])
+
+  // Update tag suggestions when tags change (remove already-added tags)
+  useEffect(() => {
+    const availableTags = allTags.filter(t => !tags.includes(t.id))
+    setTagSuggestions(availableTags)
+  }, [tags, allTags])
 
   const loadItem = async (id: string) => {
     try {
