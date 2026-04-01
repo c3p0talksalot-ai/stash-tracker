@@ -137,6 +137,8 @@ export function AutocompleteInput({
             numColumns > 1 && { flexDirection: "row", flexWrap: "wrap" },
           ]}
         >
+          {/* DEBUG */}
+          {console.log("[SUGGESTIONS_BLOCK] rendering, filtered count:", filteredSuggestions.length)}
           {filteredSuggestions.map((item) => (
             <TouchableOpacity
               key={item.id}
