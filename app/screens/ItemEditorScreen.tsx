@@ -484,6 +484,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
         <View style={themed($field)}>
           <Text style={themed($label)}>Name *</Text>
           <AutocompleteInput
+                inline={true}
             value={name}
             onChangeText={(text) => { setName(text); nameRef.current = text; clearTimeout(debounceTimer.current); debounceTimer.current = setTimeout(() => { if (autosave && hasUnsavedChanges && !isSaving) handleSaveInternal() }, 1500) }}
             onBlur={handleBlur}
@@ -497,6 +498,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
         <View style={themed($field)}>
           <Text style={themed($label)}>Location</Text>
           <AutocompleteInput
+                inline={true}
             value={location}
             onChangeText={(text) => { setLocation(text); locationRef.current = text; clearTimeout(debounceTimer.current); debounceTimer.current = setTimeout(() => { if (autosave && hasUnsavedChanges && !isSaving) handleSaveInternal() }, 1500) }}
             onBlur={handleBlur}
@@ -533,6 +535,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
             ))}
             <View style={themed($tagInputContainer)}>
               <AutocompleteInput
+                inline={true}
                 value={newTag}
                 onChangeText={(text) => { setNewTag(text); newTagRef.current = text }}
                 suggestions={tagSuggestions}
@@ -565,6 +568,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
           <View style={themed($propertyInputRow)}>
             <View style={{ flex: 1, position: "relative", zIndex: 100 }}>
               <AutocompleteInput
+                inline={true}
                 value={newPropKey}
                 onChangeText={(text) => { setNewPropKey(text); newPropKeyRef.current = text }}
                 suggestions={propertyKeySuggestions}
@@ -585,6 +589,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
           <View style={themed($propertyInputRow)}>
             <View style={{ flex: 1, position: "relative", zIndex: 100 }}>
               <AutocompleteInput
+                inline={true}
                 value={newPropUnit}
                 onChangeText={(text) => { setNewPropUnit(text); newPropUnitRef.current = text }}
                 suggestions={propertyUnitSuggestions}
