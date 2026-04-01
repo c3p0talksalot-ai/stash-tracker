@@ -4,7 +4,7 @@ import {
   Text,
   TextInput,
   StyleSheet,
-  
+  ScrollView,
   TouchableOpacity,
   useWindowDimensions,
   ViewStyle,
@@ -137,7 +137,13 @@ export function AutocompleteInput({
             numColumns > 1 && { flexDirection: "row", flexWrap: "wrap" },
           ]}
         >
-          {filteredSuggestions.map((item) => (
+          <ScrollView
+            style={styles.suggestionsList}
+            contentContainerStyle={{ flexGrow: 1 }}
+            showsVerticalScrollIndicator={true}
+            keyboardShouldPersistTaps="handled"
+          >
+            {filteredSuggestions.map((item) => (
             <TouchableOpacity
               key={item.id}
               style={[
@@ -153,6 +159,7 @@ export function AutocompleteInput({
               </Text>
             </TouchableOpacity>
           ))}
+          </ScrollView>
         </View>
       )}
       {hint && (
@@ -208,6 +215,7 @@ const styles = StyleSheet.create({
   suggestionsList: {
     maxHeight: 200,
     backgroundColor: "#1a1a1a",
+    overflow: "hidden",
   } as ViewStyle,
   suggestionItem: {
     padding: 12,
