@@ -195,12 +195,15 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     maxHeight: 200,
+    minHeight: 44,
+    overflow: "hidden",
   } as ViewStyle,
   suggestionsContainerInline: {
     position: "relative",
     top: 0,
     left: 0,
     right: 0,
+    minHeight: 44,
   } as ViewStyle,
   suggestionsList: {
     maxHeight: 200,
@@ -216,6 +219,8 @@ const styles = StyleSheet.create({
   suggestionText: {
     fontSize: 14,
     color: "#fff",
+    flexWrap: "wrap",
+    flex: 1,
   } as TextStyle,
   hint: {
     fontSize: 12,
