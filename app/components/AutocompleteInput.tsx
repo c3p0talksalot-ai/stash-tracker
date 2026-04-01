@@ -182,6 +182,7 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   suggestionsList: {
     maxHeight: 200,
+    backgroundColor: "#fff",
   } as ViewStyle,
   suggestionItem: {
     padding: 12,
@@ -191,6 +192,7 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   suggestionText: {
     fontSize: 14,
+    color: "#000",
   } as TextStyle,
   hint: {
     fontSize: 12,
