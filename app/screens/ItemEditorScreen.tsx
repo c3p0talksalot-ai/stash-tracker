@@ -784,6 +784,7 @@ const $propertyInputRow: ViewStyle = {
   flexDirection: "row",
   gap: 8,
   marginTop: 8,
+  marginBottom: 24,  // Space for inline autocomplete dropdown
   position: "relative",
   zIndex: 50,
 }
