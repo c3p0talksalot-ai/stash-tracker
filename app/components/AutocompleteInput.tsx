@@ -85,14 +85,17 @@ export function AutocompleteInput({
   }, [value, isFocused, suggestions.length, filteredSuggestions.length, showSuggestions])
 
   const handleSelect = (option: AutocompleteOption) => {
-    console.log("[AutocompleteInput] handleSelect:", option.label)
+    console.log("[AutocompleteInput] handleSelect:", option.label, "onSelect exists:", !!onSelect)
     // If parent has onSelect, let it handle the selection
     if (onSelect) {
+      console.log("[handleSelect] calling onSelect with:", option.label)
       onSelect(option)
       // Clear the input for next entry
+      console.log("[handleSelect] clearing input")
       onChangeText("")
     } else {
       // Default behavior: set the value
+      console.log("[handleSelect] setting value:", option.label)
       onChangeText(option.label)
     }
     setIsFocused(false)
