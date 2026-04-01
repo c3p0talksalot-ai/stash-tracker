@@ -570,6 +570,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
                 suggestions={propertyKeySuggestions}
                 placeholder="Key (e.g., brand)"
                 inputStyle={{ flex: 1, marginRight: 8 }}
+                inline={true}
               />
             </View>
             <TextInput
@@ -590,6 +591,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
                 placeholder="Unit (optional)"
                 inputStyle={{ flex: 1 }}
                 inputRef={newPropUnitInputRef}
+                inline={true}
               />
             </View>
             <TouchableOpacity onPress={() => { Keyboard.dismiss(); addProperty(); }} style={themed($addButton)}>

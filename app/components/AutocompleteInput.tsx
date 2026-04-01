@@ -32,6 +32,7 @@ interface AutocompleteInputProps {
   autoCapitalize?: "none" | "sentences" | "words" | "characters"
   inputStyle?: ViewStyle
   inputRef?: React.RefObject<TextInput>
+  inline?: boolean  // If true, suggestions flow below input (not absolute positioned)
 }
 
 export function AutocompleteInput({
@@ -48,6 +49,7 @@ export function AutocompleteInput({
   autoCapitalize = "sentences",
   inputStyle,
   inputRef,
+  inline = false,
 }: AutocompleteInputProps) {
   const { theme } = useAppTheme()
   const { colors } = theme
@@ -123,6 +125,7 @@ export function AutocompleteInput({
           style={[
             styles.suggestionsContainer,
             { backgroundColor: "#1a1a1a", borderColor: colors.border },
+            inline && styles.suggestionsContainerInline,
             numColumns > 1 && { flexDirection: "row", flexWrap: "wrap" },
           ]}
         >
@@ -184,6 +187,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     maxHeight: 200,
+  } as ViewStyle,
+  suggestionsContainerInline: {
+    position: "relative",
+    top: 0,
+    left: 0,
+    right: 0,
   } as ViewStyle,
   suggestionsList: {
     maxHeight: 200,
