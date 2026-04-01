@@ -550,7 +550,7 @@ export function ItemEditorScreen({ navigation, route }: Props) {
           <Text style={themed($hint)}>Suggestions: {availableTags.slice(0, 4).join(", ")}</Text>
         </View>
 
-        <View style={[themed($field), { zIndex: 5 }]}>
+        <View style={[themed($field), { zIndex: 5, position: "relative" }]}>
           <Text style={themed($label)}>Properties</Text>
           {properties.map((prop, index) => (
             <View key={index} style={themed($propertyRow)}>
@@ -563,13 +563,15 @@ export function ItemEditorScreen({ navigation, route }: Props) {
             </View>
           ))}
           <View style={themed($propertyInputRow)}>
-            <AutocompleteInput
-              value={newPropKey}
-              onChangeText={(text) => { setNewPropKey(text); newPropKeyRef.current = text }}
-              suggestions={propertyKeySuggestions}
-              placeholder="Key (e.g., brand)"
-              inputStyle={{ flex: 1, marginRight: 8 }}
-            />
+            <View style={{ flex: 1, position: "relative", zIndex: 100 }}>
+              <AutocompleteInput
+                value={newPropKey}
+                onChangeText={(text) => { setNewPropKey(text); newPropKeyRef.current = text }}
+                suggestions={propertyKeySuggestions}
+                placeholder="Key (e.g., brand)"
+                inputStyle={{ flex: 1, marginRight: 8 }}
+              />
+            </View>
             <TextInput
               ref={newPropValueInputRef}
               style={[themed($input), { flex: 1, marginRight: 8 }]}
@@ -580,14 +582,16 @@ export function ItemEditorScreen({ navigation, route }: Props) {
             />
           </View>
           <View style={themed($propertyInputRow)}>
-            <AutocompleteInput
-              value={newPropUnit}
-              onChangeText={(text) => { setNewPropUnit(text); newPropUnitRef.current = text }}
-              suggestions={propertyUnitSuggestions}
-              placeholder="Unit (optional)"
-              inputStyle={{ flex: 1 }}
-              inputRef={newPropUnitInputRef}
-            />
+            <View style={{ flex: 1, position: "relative", zIndex: 100 }}>
+              <AutocompleteInput
+                value={newPropUnit}
+                onChangeText={(text) => { setNewPropUnit(text); newPropUnitRef.current = text }}
+                suggestions={propertyUnitSuggestions}
+                placeholder="Unit (optional)"
+                inputStyle={{ flex: 1 }}
+                inputRef={newPropUnitInputRef}
+              />
+            </View>
             <TouchableOpacity onPress={() => { Keyboard.dismiss(); addProperty(); }} style={themed($addButton)}>
               <Text style={themed($addButtonText)}>Add</Text>
             </TouchableOpacity>
@@ -779,7 +783,7 @@ const $propertyInputRow: ViewStyle = {
   gap: 8,
   marginTop: 8,
   position: "relative",
-  zIndex: 10,
+  zIndex: 50,
 }
 
 const $iconButton: ThemedStyle<ViewStyle> = () => ({
