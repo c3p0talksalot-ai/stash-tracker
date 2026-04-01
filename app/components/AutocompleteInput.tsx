@@ -143,8 +143,10 @@ export function AutocompleteInput({
             showsVerticalScrollIndicator={true}
             keyboardShouldPersistTaps="handled"
           >
-            {filteredSuggestions.map((item) => (
-            <TouchableOpacity
+            {filteredSuggestions.map((item) => {
+              console.log("[render] suggestion item:", item.label)
+              return (
+              <TouchableOpacity
               key={item.id}
               style={[
                 styles.suggestionItem,
@@ -158,7 +160,8 @@ export function AutocompleteInput({
                 {item.label}
               </Text>
             </TouchableOpacity>
-          ))}
+              )
+            })}
           </ScrollView>
         </View>
       )}
