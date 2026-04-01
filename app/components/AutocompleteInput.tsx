@@ -145,7 +145,7 @@ export function AutocompleteInput({
                 { borderBottomColor: colors.border },
                 numColumns > 1 && { width: `${100 / numColumns}%` },
               ]}
-              onPress={() => handleSelect(item)}
+              onPress={() => { console.log("[onPress] tapped:", item.label); handleSelect(item) }}
               activeOpacity={0.7}
             >
               <Text style={[styles.suggestionText, { color: "#fff" }]}>
