@@ -6,6 +6,7 @@ import {
   StyleSheet,
   
   TouchableOpacity,
+  Pressable,
   useWindowDimensions,
   ViewStyle,
   TextStyle,
@@ -140,20 +141,20 @@ export function AutocompleteInput({
           {/* DEBUG */}
           {console.log("[SUGGESTIONS_BLOCK] rendering, filtered count:", filteredSuggestions.length)}
           {filteredSuggestions.map((item) => (
-            <TouchableOpacity
+            <Pressable
               key={item.id}
-              style={[
+              style={({ pressed }) => [
                 styles.suggestionItem,
                 { borderBottomColor: colors.border },
                 numColumns > 1 && { width: `${100 / numColumns}%` },
+                pressed && { backgroundColor: "#333" },
               ]}
               onPress={() => { console.log("[onPress] tapped:", item.label); handleSelect(item) }}
-              activeOpacity={0.7}
             >
               <Text style={[styles.suggestionText, { color: "#fff" }]}>
                 {item.label}
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           ))}
         </View>
       )}
