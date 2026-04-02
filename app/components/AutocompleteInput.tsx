@@ -56,6 +56,7 @@ export function AutocompleteInput({
   const { colors } = theme
   const { width } = useWindowDimensions()
   const [isFocused, setIsFocused] = useState(false)
+  const isSelectingRef = useRef(false)
 
   // Determine number of columns based on screen width
   const numColumns = useMemo(() => {
@@ -87,6 +88,7 @@ export function AutocompleteInput({
 
   const handleSelect = (option: AutocompleteOption) => {
     console.log("[AutocompleteInput] handleSelect:", option.label, "onSelect exists:", !!onSelect)
+    isSelectingRef.current = true
     // If parent has onSelect, let it handle the selection
     if (onSelect) {
       console.log("[handleSelect] calling onSelect with:", option.label)
@@ -95,7 +97,10 @@ export function AutocompleteInput({
       setIsFocused(true)
       // Clear the input on next tick to prevent state sync issues
       console.log("[handleSelect] clearing input")
-      setTimeout(() => onChangeText(""), 0)
+      setTimeout(() => {
+        onChangeText("")
+        isSelectingRef.current = false
+      }, 0)
     } else {
       // Default behavior: set the value
       console.log("[handleSelect] setting value:", option.label)
@@ -125,6 +130,11 @@ export function AutocompleteInput({
         autoCapitalize={autoCapitalize}
         onFocus={() => { console.log("[onFocus]"); setIsFocused(true) }}
         onBlur={() => {
+          // Don't blur if we're in the middle of selecting
+          if (isSelectingRef.current) {
+            console.log("[onBlur] selection in progress, skipping")
+            return
+          }
           // Only blur if there are no suggestions being shown
           if (!showSuggestions) {
             console.log("[onBlur] no suggestions, clearing focus")
