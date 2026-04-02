@@ -121,10 +121,14 @@ export function AutocompleteInput({
         placeholder={placeholder}
         placeholderTextColor={colors.textDim}
         autoCapitalize={autoCapitalize}
-        onFocus={() => setIsFocused(true)}
+        onFocus={() => { console.log("[onFocus]"); setIsFocused(true) }}
         onBlur={() => {
-          setIsFocused(false)
-          if (onBlur) onBlur()
+          console.log("[onBlur] delay to check for selection")
+          // Delay to allow onPress to register first
+          setTimeout(() => {
+            setIsFocused(false)
+            if (onBlur) onBlur()
+          }, 200)
         }}
         onSubmitEditing={onSubmitEditing}
         editable={!disabled}
