@@ -91,11 +91,11 @@ export function AutocompleteInput({
     if (onSelect) {
       console.log("[handleSelect] calling onSelect with:", option.label)
       onSelect(option)
-      // Clear the input for next entry
-      console.log("[handleSelect] clearing input")
-      onChangeText("")
       // Keep focus so user can keep adding
       setIsFocused(true)
+      // Clear the input on next tick to prevent state sync issues
+      console.log("[handleSelect] clearing input")
+      setTimeout(() => onChangeText(""), 0)
     } else {
       // Default behavior: set the value
       console.log("[handleSelect] setting value:", option.label)
