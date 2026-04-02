@@ -56,7 +56,6 @@ export function AutocompleteInput({
   const { colors } = theme
   const { width } = useWindowDimensions()
   const [isFocused, setIsFocused] = useState(false)
-  const [showDropdown, setShowDropdown] = useState(false)
 
   // Determine number of columns based on screen width
   const numColumns = useMemo(() => {
@@ -79,7 +78,7 @@ export function AutocompleteInput({
     return filtered
   }, [value, suggestions])
 
-  const showSuggestions = showDropdown && filteredSuggestions.length > 0
+  const showSuggestions = isFocused && filteredSuggestions.length > 0
 
   // Debug: log when suggestions change or focus changes
   useEffect(() => {
@@ -92,32 +91,22 @@ export function AutocompleteInput({
     if (onSelect) {
       console.log("[handleSelect] calling onSelect with:", option.label)
       onSelect(option)
+      // Clear the input for next entry
+      console.log("[handleSelect] clearing input")
+      onChangeText("")
       // Keep focus so user can keep adding
       setIsFocused(true)
-      // Clear the input after the next render to avoid triggering onChangeText during this callback
-      setTimeout(() => {
-        onChangeText("")
-      }, 0)
     } else {
       // Default behavior: set the value
       console.log("[handleSelect] setting value:", option.label)
       onChangeText(option.label)
-      setShowDropdown(false)
       setIsFocused(false)
       Keyboard.dismiss()
     }
   }
 
-  // Close dropdown when clicking outside (on container tap)
-  const handleContainerPress = () => {
-    console.log("[containerPress] closing dropdown")
-    setShowDropdown(false)
-    setIsFocused(false)
-    Keyboard.dismiss()
-  }
-
   return (
-    <View style={styles.container} onTouchStart={handleContainerPress}>
+    <View style={styles.container}>
       {label && (
         <Text style={[styles.label, { color: colors.text }]}>{label}</Text>
       )}
@@ -134,7 +123,7 @@ export function AutocompleteInput({
         placeholder={placeholder}
         placeholderTextColor={colors.textDim}
         autoCapitalize={autoCapitalize}
-        onFocus={() => { console.log("[onFocus]"); setIsFocused(true); setShowDropdown(true) }}
+        onFocus={() => { console.log("[onFocus]"); setIsFocused(true) }}
         onBlur={() => {
           // Only blur if there are no suggestions being shown
           if (!showSuggestions) {
