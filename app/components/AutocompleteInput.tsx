@@ -94,13 +94,15 @@ export function AutocompleteInput({
       // Clear the input for next entry
       console.log("[handleSelect] clearing input")
       onChangeText("")
+      // Keep focus so user can keep adding
+      setIsFocused(true)
     } else {
       // Default behavior: set the value
       console.log("[handleSelect] setting value:", option.label)
       onChangeText(option.label)
+      setIsFocused(false)
+      Keyboard.dismiss()
     }
-    setIsFocused(false)
-    Keyboard.dismiss()
   }
 
   return (
