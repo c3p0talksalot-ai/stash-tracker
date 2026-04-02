@@ -135,6 +135,7 @@ export function AutocompleteInput({
       />
       {showSuggestions && (
         <View
+          pointerEvents="box-none"
           style={[
             styles.suggestionsContainer,
             { backgroundColor: "#1a1a1a", borderColor: colors.border },
@@ -147,6 +148,8 @@ export function AutocompleteInput({
           {filteredSuggestions.map((item) => (
             <Pressable
               key={item.id}
+              pointerEvents="auto"
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               style={({ pressed }) => [
                 styles.suggestionItem,
                 { borderBottomColor: colors.border },
@@ -154,7 +157,6 @@ export function AutocompleteInput({
                 pressed && { backgroundColor: "#333" },
               ]}
               onPressIn={() => { console.log("[onPressIn] tapped:", item.label); handleSelect(item) }}
-              onPress={() => { console.log("[onPress] tapped:", item.label); handleSelect(item) }}
             >
               <Text style={[styles.suggestionText, { color: "#fff" }]}>
                 {item.label}
