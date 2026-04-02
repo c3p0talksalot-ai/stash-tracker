@@ -153,6 +153,7 @@ export function AutocompleteInput({
                 numColumns > 1 && { width: `${100 / numColumns}%` },
                 pressed && { backgroundColor: "#333" },
               ]}
+              onPressIn={() => { console.log("[onPressIn] tapped:", item.label); handleSelect(item) }}
               onPress={() => { console.log("[onPress] tapped:", item.label); handleSelect(item) }}
             >
               <Text style={[styles.suggestionText, { color: "#fff" }]}>
