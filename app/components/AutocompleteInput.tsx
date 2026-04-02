@@ -123,12 +123,14 @@ export function AutocompleteInput({
         autoCapitalize={autoCapitalize}
         onFocus={() => { console.log("[onFocus]"); setIsFocused(true) }}
         onBlur={() => {
-          console.log("[onBlur] delay to check for selection")
-          // Delay to allow onPress to register first
-          setTimeout(() => {
+          // Only blur if there are no suggestions being shown
+          if (!showSuggestions) {
+            console.log("[onBlur] no suggestions, clearing focus")
             setIsFocused(false)
             if (onBlur) onBlur()
-          }, 200)
+          } else {
+            console.log("[onBlur] suggestions shown, keeping focus")
+          }
         }}
         onSubmitEditing={onSubmitEditing}
         editable={!disabled}
