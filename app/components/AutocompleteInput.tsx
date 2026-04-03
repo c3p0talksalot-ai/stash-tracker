@@ -88,19 +88,14 @@ export function AutocompleteInput({
 
   const handleSelect = (option: AutocompleteOption) => {
     console.log("[AutocompleteInput] handleSelect:", option.label, "onSelect exists:", !!onSelect)
-    isSelectingRef.current = true
+    // Don't prevent blur - let the selection happen naturally
     // If parent has onSelect, let it handle the selection
     if (onSelect) {
       console.log("[handleSelect] calling onSelect with:", option.label)
       onSelect(option)
-      // Keep focus so user can keep adding
-      setIsFocused(true)
-      // Clear the input on next tick to prevent state sync issues
+      // Clear the input immediately after calling onSelect
       console.log("[handleSelect] clearing input")
-      setTimeout(() => {
-        onChangeText("")
-        isSelectingRef.current = false
-      }, 0)
+      onChangeText("")
     } else {
       // Default behavior: set the value
       console.log("[handleSelect] setting value:", option.label)
@@ -130,11 +125,6 @@ export function AutocompleteInput({
         autoCapitalize={autoCapitalize}
         onFocus={() => { console.log("[onFocus]"); setIsFocused(true) }}
         onBlur={() => {
-          // Don't blur if we're in the middle of selecting
-          if (isSelectingRef.current) {
-            console.log("[onBlur] selection in progress, skipping")
-            return
-          }
           // Only blur if there are no suggestions being shown
           if (!showSuggestions) {
             console.log("[onBlur] no suggestions, clearing focus")
