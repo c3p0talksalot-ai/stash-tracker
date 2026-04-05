@@ -13,6 +13,7 @@ import { ErrorBoundary } from "@/screens/ErrorScreen/ErrorBoundary"
 import { ItemsListScreen } from "@/screens/ItemsListScreen"
 import { ItemEditorScreen } from "@/screens/ItemEditorScreen"
 import { LoginScreen } from "@/screens/LoginScreen"
+import { HomeScreen } from "@/screens/HomeScreen"
 import { NewItemCameraScanScreen } from "@/screens/NewItemCameraScanScreen"
 import { GalleryPickerScreen } from "@/screens/GalleryPickerScreen"
 import { CropScreen } from "@/screens/CropScreen"
@@ -52,7 +53,7 @@ const AppStack = () => {
           backgroundColor: colors.background,
         },
       }}
-      initialRouteName="ItemsList"
+      initialRouteName="Home"
     >
       {showAuthFlow && !isAuthenticated ? (
         <>
@@ -61,6 +62,7 @@ const AppStack = () => {
       ) : (
         <>
           <Stack.Screen name="Welcome" component={WelcomeScreen} />
+          <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="ItemsList" component={ItemsListScreen} />
           <Stack.Screen name="ItemEditor" component={ItemEditorScreen} />
           <Stack.Screen name="Settings" component={SettingsScreen} />

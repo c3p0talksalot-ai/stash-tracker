@@ -18,6 +18,7 @@ export type DemoTabParamList = {
 // App Stack Navigator types
 export type AppStackParamList = {
   Welcome: undefined
+  Home: undefined
   Login: undefined
   Settings: undefined
   ItemsList: undefined
